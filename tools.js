@@ -1,3 +1,4 @@
+const fs = require("fs");
 module.exports = {
   //Возвращает массив имен файлов. Файл с названием README.txt не сохраняет
   //folder - путь до папки 'images/stickers'
@@ -69,4 +70,39 @@ module.exports = {
 
     return commands;
   },
+
+  // Считает количество строк в файле
+  // Принимает путь до файла
+  // Возвращает число строк
+  countFileLines(filePath) {
+    return new Promise((resolve, reject) => {
+      let lineCount = 0;
+      fs.createReadStream(filePath)
+          .on("data", (buffer) => {
+            let idx = -1;
+            lineCount--; // Because the loop will run once for idx=-1
+            do {
+              idx = buffer.indexOf(10, idx+1);
+              lineCount++;
+            } while (idx !== -1);
+          })
+          .on("end", () => {
+            console.log(lineCount)
+        resolve(lineCount);
+      })
+          .on("error", reject);
+    });
+  }
+  /*{
+    let i;
+    let count = 0;
+    require('fs').createReadStream(filePath)
+        .on('data', function(chunk) {
+          for (i=0; i < chunk.length; ++i)
+            if (chunk[i] == 10) count++;
+        })
+        .on('end', function() {
+          console.log(count)
+        });
+  }*/,
 };
