@@ -320,7 +320,7 @@ client.on("messageCreate", async(message) => {
         reg_com(1);
         message.channel.send("Complete!");
     }
-    else if (message.mentions.users.size !== 0) {
+    else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
       let msg = message.content;
       // Ручная проверка есть ли в сообщение упоминания
       if (msg.match(/<@.?[0-9]*?>/g)) {
