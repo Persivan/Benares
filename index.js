@@ -144,11 +144,11 @@ client.on("ready", () => {
         let reg_com = require("./reg_com.js");
         reg_com(0);
         //Update server icon
-        let mainGuild = client.guilds.cache.get('803319898813890620');
-        let index = Math.floor(Math.random() * icons.length);
-        mainGuild.setIcon(icons[index])
-            .then(updated => console.log('Icon updated!!' + index))
-            .catch(console.error);
+        // let mainGuild = client.guilds.cache.get('803319898813890620');
+        // let index = Math.floor(Math.random() * icons.length);
+        // mainGuild.setIcon(icons[index])
+        //     .then(updated => console.log('Icon updated!!' + index))
+        //     .catch(console.error);
         //Change status
         // generate random number between 1 and list length.
         let randomType = Math.floor(Math.random() * 3);
@@ -214,6 +214,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
+        return;
     }
     else if (message.content === "yatta") {
         if (message.author.id === "295079891055935499") {
@@ -321,21 +322,26 @@ client.on("messageCreate", async(message) => {
         message.channel.send("Complete!");
     }
     else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
-      let msg = message.content;
-      // Ручная проверка есть ли в сообщение упоминания
-      if (msg.match(/<@.?[0-9]*?>/g)) {
-        //Replace All Message Mentions Into Nothing
-        msg = msg.replace(/<@.?[0-9]*?>/g, "");
-      };
-      msg = msg.replace(" ", "");
-      if (msg === "") {
-        await message.reply({
-          files: [
-            '../images/stupid.png'
-          ],
-          content: 'https://youtu.be/GQo-I3lGh9I'
-        });
-      }
+        console.log('someone did it again')
+        let msg = message.content;
+        let attachments_size = message.attachments.size;
+        // Ручная проверка есть ли в сообщение упоминания
+        if (msg.match(/<@.?[0-9]*?>/g)) {
+            //Replace All Message Mentions Into Nothing
+            msg = msg.replace(/<@.?[0-9]*?>/g, "");
+        }
+        if (msg === "" && attachments_size === 0) {
+            await message.reply({
+                files: [
+                    '../images/stupid.png'
+                ],
+                content: 'https://youtu.be/GQo-I3lGh9I'
+            });
+            if (message.author.id == '252864307694534667') {
+                await message.member.kick('Sends an empty message with mentions in main channel')
+            }
+            await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC');
+        }
     }
 });
 
@@ -406,6 +412,18 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     //     })
     //     .catch("Error in follow");
     //   }
+    //if (newState.member.guild.id === '803319898813890620') {
+    //    newState.member.setNickname(null)
+    //        .catch(console.log);
+    //}
+
+    //Yarik only 1 channel
+/*    const toFollowId = '968569427991887872';    //id куда перекидывать
+    const whoId = '295465000586182657';         //id чела которого перекидывать
+    if (newState.member.user.id === whoId && newState.member.voice.id !== toFollowId) {
+        newState.member.voice.setChannel(toFollowId)
+            .catch(console.error);
+    }*/
 
 
     //Check if event happened NOT IN VOICE CHANNEL LOL
