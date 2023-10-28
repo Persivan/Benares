@@ -10,6 +10,12 @@ const config = require("./config");
 const fs = require("fs");
 const Tools = require("./tools");
 
+// OpenAI
+const OpenAI = require('openai');
+const openai = new OpenAI({
+    apiKey: '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', // defaults to process.env["OPENAI_API_KEY"]
+});
+
 const games = [
     "Honkai Impact 3",
     "Genshin Impact",
@@ -35,7 +41,7 @@ const music = [
         "https://www.youtube.com/watch?v=I4rtcJnRd6s&ab_channel=SeiReiko",
     ],
     [
-        "Cyberangle",
+        "Cyberangel",
         "https://www.youtube.com/watch?v=ngPQWAwRk70&list=PLLX1bpH-W3ZBZ9ld6U59l61hzmG0_LKLW&index=5&ab_channel=HonkaiImpact3rd",
     ],
     [
@@ -133,6 +139,35 @@ const icons = [
 //custom status doesnt work yet https://stackoverflow.com/questions/58568377/how-can-i-set-custom-status-in-discord-bot-according-to-new-update
 const custom = ["I am Benares, HoV's dragon", "Dragoon"];
 
+function AlexeyProtection(text) {
+    text = text.replaceAll('o', 'о').replaceAll('e', 'е')
+    return text;
+}
+function isNameQuestion(text) {
+    text = text.toLowerCase();
+    if ((text.includes('твое') || text.includes('ты') || text.includes('твоё') || text.includes('you') || text.includes('свое') || text.includes('как') || text.includes('своё') || text.includes('your')  || text.includes('ur') || text.includes('тебя')) &&
+        (text.includes('имя') || text.includes('name') || text.includes('бенарес')  || text.includes('Benares') || text.includes('зовут'))) {
+        return true;
+    }
+    return false;
+}
+
+function isSexQuestion(text) {
+    text = text.toLowerCase();
+    if (text.includes('ты') && (text.includes('мужчина') || text.includes('женщина') || text.includes('пола'))) {
+        return true;
+    }
+    return false;
+}
+
+function isOldQuestion(text) {
+    text = text.toLowerCase();
+    if ((text.includes('сколько') || text.includes('тебе')) && (text.includes('лет'))) {
+        return true;
+    }
+    return false;
+}
+
 //Change status every 480 seconds and registr commands
 client.on("ready", () => {
     //Register commands
@@ -176,8 +211,11 @@ client.on("ready", () => {
 
 //Message reactions
 client.on("messageCreate", async(message) => {
+    //msgContent = AlexeyProtection(message.content);
     // Защита, чтобюы бот не отвечал самому себе
-    if (message.author.bot) return;
+    if (message.author.bot) {
+        return;
+    }
     else if (message.content === "test") {
         message
             .reply("tested")
@@ -191,31 +229,42 @@ client.on("messageCreate", async(message) => {
             user.send("Test msg " + message.author.username);
         });
     }
-    else if (message.mentions.has(client.user)) {
-        let filePath = "./index.js";
-        let count = 0;
-        await Tools.countFileLines(filePath)
-            .then((x) => {
-                count = x;
-            })
-            .catch(() => {
-                console.log(`Error in countFileLines with path \"${filePath}\"`)
-                count = "**_more then 1? i guess... sorry there is error)_**"
-            });
-        message.channel
-            .send({
-                content:
-                    `I have ${count} lines of code, don't touch me... HELP! <@!295079891055935499> `,
-                files: [config.folders.images + "/help.png"],
-            })
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-        return;
-    }
+
+    // Реакция на упоминание сообщений бота
+    // else if (message.mentions.has(client.user)) {
+    //     if (message.author.id === "295079891055935499") {
+    //         message.channel
+    //             .send({
+    //                 content:
+    //                     `Yes, my master? https://www.youtube.com/watch?v=3M3x4rsyd84`
+    //             })
+    //             .catch(console.error);
+    //         return
+    //     }
+    //     let filePath = "./index.js";
+    //     let count = 0;
+    //     await Tools.countFileLines(filePath)
+    //         .then((x) => {
+    //             count = x;
+    //         })
+    //         .catch(() => {
+    //             console.log(`Error in countFileLines with path \"${filePath}\"`)
+    //             count = "**_more then 1? i guess... sorry there is error)_**"
+    //         });
+    //     message.channel
+    //         .send({
+    //             content:
+    //                 `I have ${count} lines of code, don't touch me... HELP! <@!295079891055935499> `,
+    //             files: [config.folders.images + "/help.png"],
+    //         })
+    //         .then(() =>
+    //             console.log(
+    //                 `Send message on "${message.content}" from "${message.author.username}"`
+    //             )
+    //         )
+    //         .catch(console.error);
+    //     return;
+    // }
     else if (message.content === "yatta") {
         if (message.author.id === "295079891055935499") {
             message.delete();
@@ -321,27 +370,92 @@ client.on("messageCreate", async(message) => {
         reg_com(1);
         message.channel.send("Complete!");
     }
-    else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
-        console.log('someone did it again')
+
+    // Кик с сервера за сообщения без упоминаний в мейне
+    // else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
+    //     let msg = message.content;
+    //     let attachments_size = message.attachments.size;
+    //     // Ручная проверка есть ли в сообщение упоминания
+    //     if (msg.match(/<@.?[0-9]*?>/g)) {
+    //         //Replace All Message Mentions Into Nothing
+    //         console.log('someone did it again')
+    //         msg = msg.replaceAll(/<@.?[0-9]*?>/g, "");
+    //         msg = msg.replaceAll(" ", "");
+    //     }
+    //     if (msg === "" && attachments_size === 0) {
+    //         await message.reply({
+    //             // Ведьмак
+    //             // files: [
+    //             //     '../images/stupid.png'
+    //             // ],
+    //             // content: 'https://youtu.be/GQo-I3lGh9I'
+    //             // Просто рандом
+    //             content: 'bb'
+    //         });
+    //         await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC')
+    //             .catch(e => console.log(e))
+    //         //if (message.author.id == '252864307694534667') {
+    //             await message.member.kick('Sends an empty message with mentions in main channel')
+    //                 .catch(e => console.log(e))
+    //         //}
+    //
+    //     }
+    // }
+
+
+    // OpenAI чат
+
+    // else if (isNameQuestion(msgContent)) {
+    //     try {
+    //         await message.reply('Меня зовут Бенарес.');
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
+    // else if (isSexQuestion(msgContent)) {
+    //     try {
+    //         await message.reply('Я не идентифирую себе пол. Если бы, то выбрал быть девушкой.');
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
+    // else if (isOldQuestion(msgContent)) {
+    //     try {
+    //         await message.reply('18 лет. Я родился 1 февраля 2000 года в башне Вавилона, Сибирь.');
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
+
+    else if (message.channelId === "1062427808091099266" ||
+        message.channelId === "1156308603343483010"
+    ) {
         let msg = message.content;
-        let attachments_size = message.attachments.size;
-        // Ручная проверка есть ли в сообщение упоминания
-        if (msg.match(/<@.?[0-9]*?>/g)) {
-            //Replace All Message Mentions Into Nothing
-            msg = msg.replace(/<@.?[0-9]*?>/g, "");
-        }
-        if (msg === "" && attachments_size === 0) {
-            await message.reply({
-                files: [
-                    '../images/stupid.png'
-                ],
-                content: 'https://youtu.be/GQo-I3lGh9I'
-            });
-            if (message.author.id == '252864307694534667') {
-                await message.member.kick('Sends an empty message with mentions in main channel')
-            }
-            await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC');
-        }
+
+        // Ничего не выводить если это комментарий
+        if (msg.startsWith('//') || msg === "") return;
+
+        let currDate = new Date().toLocaleDateString();
+        let currTime = new Date().toLocaleTimeString();
+        console.log(`${currDate} ${currTime} openAI message: "${msg}"; name = ${message.author.username}`);
+        await openai.chat.completions.create({
+            messages: [{ role: 'user', content: msg }],
+            model: 'gpt-4',
+        })
+            .then(async result => {
+                console.log(result.choices[0].message);
+                 await message.reply(result.choices[0].message.content)
+                     .catch(async er=> (await message.reply('Something went wrong (скорее всего размер сообщения от бота более 2000 символов')))
+            })
+            .catch(async err => {
+                console.log(err);
+                try {
+                    await message.reply("Something went wrong(( " + err.response.status + ": " + err.response.statusText);
+                } catch (e) {
+                    console.log(e);
+                }
+
+            })
     }
 });
 

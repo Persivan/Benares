@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node ."
+  },
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.1.0-canary.0",
@@ -7,7 +10,9 @@
     "discord.js": "^13.1.0",
     "ffmpeg-static": "^4.4.0",
     "libsodium-wrappers": "^0.7.9",
+    "openai": "^4.10.0",
     "puppeteer": "^13.0.1",
+    "soap": "^1.0.0",
     "tweetnacl": "^1.0.3"
   }
 }
