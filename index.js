@@ -1,20 +1,29 @@
-const {Client, Intents, Util} = require("discord.js");
+require('dotenv').config();
+
+const {Client, GatewayIntentBits, ChannelType, PermissionsBitField} = require("discord.js");
 const client = new Client({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_VOICE_STATES,
-    ],
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.MessageContent
+    ]
 });
 const config = require("./config");
 const fs = require("fs");
-const Tools = require("./tools");
+const Tools = require("./tools/tools");
 
 // OpenAI
 const OpenAI = require('openai');
 const openai = new OpenAI({
-    apiKey: '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', // defaults to process.env["OPENAI_API_KEY"]
+    apiKey: process.env["OPENAI_API_KEY"],
 });
+
+const ezJson = require('./tools/ezJson')
+ezJson.openFile('./db.json');
+const db = ezJson.getObj();
+
 
 const games = [
     "Honkai Impact 3",
@@ -121,102 +130,167 @@ const videos = [
     ],
 ];
 
-const icons = [
-    "../images/server_icon/bronya_light.gif",
-    "../images/server_icon/fuhua_bonkcat.gif",
-    "../images/server_icon/march7th_cookie.gif",
-    "../images/server_icon/mei_tuna.gif",
-    "../images/server_icon/honkai-impact-herrscher-of-thunder.gif",
-    '../images/server_icon/honkai-impact-sirin.gif',
-    '../images/server_icon/7560b941c497abe77f0466f62d8405a7.gif',
-    '../images/server_icon/elysia.gif',
-    '../images/server_icon/mei.gif',
-    '../images/server_icon/mobius_1.gif',
-    '../images/server_icon/mobius_2.gif',
-    '../images/server_icon/mobius_3.gif',
-];
+// const icons = [
+//     "../images/server_icon/bronya_light.gif",
+//     "../images/server_icon/fuhua_bonkcat.gif",
+//     "../images/server_icon/march7th_cookie.gif",
+//     "../images/server_icon/mei_tuna.gif",
+//     "../images/server_icon/honkai-impact-herrscher-of-thunder.gif",
+//     '../images/server_icon/honkai-impact-sirin.gif',
+//     '../images/server_icon/7560b941c497abe77f0466f62d8405a7.gif',
+//     '../images/server_icon/elysia.gif',
+//     '../images/server_icon/mei.gif',
+//     '../images/server_icon/mobius_1.gif',
+//     '../images/server_icon/mobius_2.gif',
+//     '../images/server_icon/mobius_3.gif',
+// ];
 
 //custom status doesnt work yet https://stackoverflow.com/questions/58568377/how-can-i-set-custom-status-in-discord-bot-according-to-new-update
 const custom = ["I am Benares, HoV's dragon", "Dragoon"];
 
-function AlexeyProtection(text) {
-    text = text.replaceAll('o', 'о').replaceAll('e', 'е')
-    return text;
-}
-function isNameQuestion(text) {
-    text = text.toLowerCase();
-    if ((text.includes('твое') || text.includes('ты') || text.includes('твоё') || text.includes('you') || text.includes('свое') || text.includes('как') || text.includes('своё') || text.includes('your')  || text.includes('ur') || text.includes('тебя')) &&
-        (text.includes('имя') || text.includes('name') || text.includes('бенарес')  || text.includes('Benares') || text.includes('зовут'))) {
-        return true;
-    }
-    return false;
-}
-
-function isSexQuestion(text) {
-    text = text.toLowerCase();
-    if (text.includes('ты') && (text.includes('мужчина') || text.includes('женщина') || text.includes('пола'))) {
-        return true;
-    }
-    return false;
-}
-
-function isOldQuestion(text) {
-    text = text.toLowerCase();
-    if ((text.includes('сколько') || text.includes('тебе')) && (text.includes('лет'))) {
-        return true;
-    }
-    return false;
-}
-
 //Change status every 480 seconds and registr commands
 client.on("ready", () => {
     //Register commands
-    let reg_com = require("./reg_com.js");
+    let reg_com = require("./tools/reg_com.js");
     reg_com(0);
     // run every 480 seconds
-    setInterval(() => {
+    // run every 480 seconds
+    setInterval(async () => {
         //Register commands
-        let reg_com = require("./reg_com.js");
+        let reg_com = require("./tools/reg_com.js");
         reg_com(0);
+
         //Update server icon
         // let mainGuild = client.guilds.cache.get('803319898813890620');
         // let index = Math.floor(Math.random() * icons.length);
         // mainGuild.setIcon(icons[index])
         //     .then(updated => console.log('Icon updated!!' + index))
         //     .catch(console.error);
+
         //Change status
         // generate random number between 1 and list length.
         let randomType = Math.floor(Math.random() * 3);
         if (randomType == 0) {
             let randomIndex = Math.floor(Math.random() * games.length);
             client.user.setActivity(games[randomIndex]);
-        }
-        else if (randomType == 1) {
+        } else if (randomType == 1) {
             let randomIndex = Math.floor(Math.random() * music.length);
             client.user.setActivity(music[randomIndex][0], {
                 type: "STREAMING",
                 url: music[randomIndex][1],
             });
-        }
-        else if (randomType == 2) {
+        } else if (randomType == 2) {
             let randomIndex = Math.floor(Math.random() * videos.length);
             client.user.setActivity(videos[randomIndex][0], {
                 type: "STREAMING",
                 url: videos[randomIndex][1],
             });
         }
+
+
+        // Выдача рофлокек ролей
+        console.log('Начинаю выдачу рофлокек ролей');
+        client.guilds.cache.forEach((guild) => {
+            console.log('ПУСТО')
+            console.log(guild.id)
+            if (!config.guilds.some((elem) => elem.id === guild.id && elem.autoRoflRole)) return;
+
+            console.log('Нашелся сервер смертников');
+            console.log(guild.name);
+            if (db.activity[guild.id].roles.length === 0) {
+                console.log('На сервере еще нет роли для рофлокеков')
+                return;
+            }
+            console.log('На сервере есть топ роль')
+            for (const roleFromDB of db.activity[guild.id].roles) {
+                console.log('Роль: ' + roleFromDB.name)
+                // Выдаем роли этим рофлокекам
+                let role = guild.roles.cache.get(roleFromDB.id);
+                guild.members.list()
+                    .then((list) => {
+                        list.forEach((member) => {
+                            // Выдаем роль, если чел есть в бд и у него последняя активность более 14 дней ИЛИ если его нет в БД
+                            let inActive = false;
+                            index = db.activity[guild.id].users.findIndex((elem) => elem.id === member.user.id)
+
+                            // Добавляем рофлороль его нет в бд
+                            if (index === -1) {
+                                console.log('Чела нет в БД: ' + member.user.username)
+                                member.roles.add(role);
+                                return;
+                            }
+                            // console.log(index);
+                            // console.log(guild.id);
+                            // console.log(db.activity);
+                            // console.log(db.activity[guild.id]);
+                            console.log(db.activity[guild.id].users[index]);
+                            let date1 = Math.floor(db.activity[guild.id].users[index].lastMessageDate / (1000 * 60 * 60 * 24));
+                            let date2 = Math.floor(db.activity[guild.id].users[index].lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
+                            let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+                            console.log('Чел из бд')
+                            console.log(db.activity[guild.id].users[index].name)
+                            console.log(date1)
+                            console.log(date2)
+                            console.log(currentDate)
+                            console.log('Кончился чел из бд')
+
+                            if (date1 && currentDate - date1 >= 14 && date2 && currentDate - date2 >= 14) inActive = true;
+
+                            console.log(member.user.username);
+                            console.log(index);
+                            console.log(inActive);
+
+                            // Добавляем рофлороль он неактивен
+                            if (inActive) {
+                                console.log('Чел найден ' + member.user.username)
+                                member.roles.add(role);
+                            }
+                        })
+                    }
+                )
+            }
+            console.log('Успешно выданы роли рофлокеков: ' + guild.name);
+        })
+        console.log('Закончил выдачу рофлокек ролей');
+
     }, 480000);
     console.log(`Logged in as ${client.user.tag}!`);
-});
+})
+;
 
 //Message reactions
-client.on("messageCreate", async(message) => {
+client.on("messageCreate", async (message) => {
     //msgContent = AlexeyProtection(message.content);
     // Защита, чтобюы бот не отвечал самому себе
-    if (message.author.bot) {
-        return;
+    if (message.author.bot) return;
+
+    // @todo переписать
+    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
+        Tools.addProps(db.activity, `${message.guildId}.users`, []);
+        Tools.addProps(db.activity, `${message.guildId}.roles`, []);
     }
-    else if (message.content === "test") {
+
+    let index = db.activity[message.guildId].users.findIndex((elem) => elem.id === message.author.id)
+    if (index !== -1) {
+        db.activity[message.guildId].users[index].lastMessageDate = Date.now();
+    } else {
+        db.activity[message.guildId].users.push({
+            id: message.author.id,
+            name: message.author.username,
+            lastMessageDate: Date.now()
+        })
+    }
+    ezJson.save(db);
+    for (const roleFromDB of db.activity[message.guildId].roles) {
+        // Выдаем роли этим рофлокекам
+        let role = message.guild.roles.cache.get(roleFromDB.id);
+        message.member.roles.remove(role)
+            .then(() => console.log('Удалена успешно роль (сообщение): ' + message.author.username))
+            .catch(() => console.log('Ошибка при удалении роли: ' + message.author.username))
+    }
+
+
+    if (message.content === "test") {
         message
             .reply("tested")
             .then(() =>
@@ -230,40 +304,40 @@ client.on("messageCreate", async(message) => {
         });
     }
 
-    // Реакция на упоминание сообщений бота
-    // else if (message.mentions.has(client.user)) {
-    //     if (message.author.id === "295079891055935499") {
-    //         message.channel
-    //             .send({
-    //                 content:
-    //                     `Yes, my master? https://www.youtube.com/watch?v=3M3x4rsyd84`
-    //             })
-    //             .catch(console.error);
-    //         return
-    //     }
-    //     let filePath = "./index.js";
-    //     let count = 0;
-    //     await Tools.countFileLines(filePath)
-    //         .then((x) => {
-    //             count = x;
-    //         })
-    //         .catch(() => {
-    //             console.log(`Error in countFileLines with path \"${filePath}\"`)
-    //             count = "**_more then 1? i guess... sorry there is error)_**"
-    //         });
-    //     message.channel
-    //         .send({
-    //             content:
-    //                 `I have ${count} lines of code, don't touch me... HELP! <@!295079891055935499> `,
-    //             files: [config.folders.images + "/help.png"],
-    //         })
-    //         .then(() =>
-    //             console.log(
-    //                 `Send message on "${message.content}" from "${message.author.username}"`
-    //             )
-    //         )
-    //         .catch(console.error);
-    //     return;
+        // Реакция на упоминание сообщений бота
+        // else if (message.mentions.has(client.user)) {
+        //     if (message.author.id === "295079891055935499") {
+        //         message.channel
+        //             .send({
+        //                 content:
+        //                     `Yes, my master? https://www.youtube.com/watch?v=3M3x4rsyd84`
+        //             })
+        //             .catch(console.error);
+        //         return
+        //     }
+        //     let filePath = "./index.js";
+        //     let count = 0;
+        //     await Tools.countFileLines(filePath)
+        //         .then((x) => {
+        //             count = x;
+        //         })
+        //         .catch(() => {
+        //             console.log(`Error in countFileLines with path \"${filePath}\"`)
+        //             count = "**_more then 1? i guess... sorry there is error)_**"
+        //         });
+        //     message.channel
+        //         .send({
+        //             content:
+        //                 `I have ${count} lines of code, don't touch me... HELP! <@!295079891055935499> `,
+        //             files: [config.folders.images + "/help.png"],
+        //         })
+        //         .then(() =>
+        //             console.log(
+        //                 `Send message on "${message.content}" from "${message.author.username}"`
+        //             )
+        //         )
+        //         .catch(console.error);
+        //     return;
     // }
     else if (message.content === "yatta") {
         if (message.author.id === "295079891055935499") {
@@ -276,8 +350,7 @@ client.on("messageCreate", async(message) => {
                     )
                 )
                 .catch(console.error);
-        }
-        else {
+        } else {
             message.delete();
             message.channel
                 .send({files: [config.folders.images + "/yatta_2.jpg"]})
@@ -288,8 +361,7 @@ client.on("messageCreate", async(message) => {
                 )
                 .catch(console.error);
         }
-    }
-    else if (message.content === "say yatta") {
+    } else if (message.content === "say yatta") {
         message.delete();
         message.channel
             .send({files: [config.folders.images + "/say_yatta.jpg"]})
@@ -299,8 +371,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "thinking") {
+    } else if (message.content === "thinking") {
         message.delete();
         message.channel
             .send({files: [config.folders.images + "/thinking_kiana.jpg"]})
@@ -310,8 +381,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "hi") {
+    } else if (message.content === "hi") {
         message.delete();
         message.channel
             .send({files: [config.folders.images + "/hi_kiana.png"]})
@@ -321,8 +391,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "not yatta") {
+    } else if (message.content === "not yatta") {
         message.delete();
         message.channel
             .send({files: [config.folders.images + "/not_yatta.jpg"]})
@@ -332,8 +401,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "help") {
+    } else if (message.content === "help") {
         message.channel
             .send("test, yatta, not yatta, help")
             .then(() =>
@@ -342,8 +410,7 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "no fear") {
+    } else if (message.content === "no fear") {
         message.delete();
         message.channel
             .send({files: [config.folders.images + "/no_fear.png"]})
@@ -353,99 +420,97 @@ client.on("messageCreate", async(message) => {
                 )
             )
             .catch(console.error);
-    }
-    else if (message.content === "del" && message.author.id === "295079891055935499") {
+    } else if (message.content === "del" && message.author.id === "295079891055935499") {
         message.channel.bulkDelete(11);
-    }
-    else if (message.content === 'ipdate') {
+    } else if (message.content === 'ipdate') {
         //Update server icon
         let mainGuild = client.guilds.cache.get('803319898813890620');
         let index = Math.floor(Math.random() * icons.length);
         mainGuild.setIcon(icons[index])
             .then(updated => console.log('Icon updated!!' + index))
             .catch(console.error);
-    }
-    else if (message.content === 'reg_com' && message.author.id === '295079891055935499') {
-        let reg_com = require("./reg_com.js");
+    } else if (message.content === 'reg_com' && message.author.id === '295079891055935499') {
+        let reg_com = require("./tools/reg_com.js");
         reg_com(1);
         message.channel.send("Complete!");
     }
 
-    // Кик с сервера за сообщения без упоминаний в мейне
-    // else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
-    //     let msg = message.content;
-    //     let attachments_size = message.attachments.size;
-    //     // Ручная проверка есть ли в сообщение упоминания
-    //     if (msg.match(/<@.?[0-9]*?>/g)) {
-    //         //Replace All Message Mentions Into Nothing
-    //         console.log('someone did it again')
-    //         msg = msg.replaceAll(/<@.?[0-9]*?>/g, "");
-    //         msg = msg.replaceAll(" ", "");
-    //     }
-    //     if (msg === "" && attachments_size === 0) {
-    //         await message.reply({
-    //             // Ведьмак
-    //             // files: [
-    //             //     '../images/stupid.png'
-    //             // ],
-    //             // content: 'https://youtu.be/GQo-I3lGh9I'
-    //             // Просто рандом
-    //             content: 'bb'
-    //         });
-    //         await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC')
-    //             .catch(e => console.log(e))
-    //         //if (message.author.id == '252864307694534667') {
-    //             await message.member.kick('Sends an empty message with mentions in main channel')
-    //                 .catch(e => console.log(e))
-    //         //}
-    //
-    //     }
-    // }
+        // Кик с сервера за сообщения без упоминаний в мейне
+        // else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
+        //     let msg = message.content;
+        //     let attachments_size = message.attachments.size;
+        //     // Ручная проверка есть ли в сообщение упоминания
+        //     if (msg.match(/<@.?[0-9]*?>/g)) {
+        //         //Replace All Message Mentions Into Nothing
+        //         console.log('someone did it again')
+        //         msg = msg.replaceAll(/<@.?[0-9]*?>/g, "");
+        //         msg = msg.replaceAll(" ", "");
+        //     }
+        //     if (msg === "" && attachments_size === 0) {
+        //         await message.reply({
+        //             // Ведьмак
+        //             // files: [
+        //             //     '../images/stupid.png'
+        //             // ],
+        //             // content: 'https://youtu.be/GQo-I3lGh9I'
+        //             // Просто рандом
+        //             content: 'bb'
+        //         });
+        //         await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC')
+        //             .catch(e => console.log(e))
+        //         //if (message.author.id == '252864307694534667') {
+        //             await message.member.kick('Sends an empty message with mentions in main channel')
+        //                 .catch(e => console.log(e))
+        //         //}
+        //
+        //     }
+        // }
 
 
-    // OpenAI чат
+        // OpenAI чат
 
-    // else if (isNameQuestion(msgContent)) {
-    //     try {
-    //         await message.reply('Меня зовут Бенарес.');
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-    // else if (isSexQuestion(msgContent)) {
-    //     try {
-    //         await message.reply('Я не идентифирую себе пол. Если бы, то выбрал быть девушкой.');
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-    // else if (isOldQuestion(msgContent)) {
-    //     try {
-    //         await message.reply('18 лет. Я родился 1 февраля 2000 года в башне Вавилона, Сибирь.');
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
+        // else if (isNameQuestion(msgContent)) {
+        //     try {
+        //         await message.reply('Меня зовут Бенарес.');
+        //     } catch (e) {
+        //         console.log(e);
+        //     }
+        // }
+        // else if (isSexQuestion(msgContent)) {
+        //     try {
+        //         await message.reply('Я не идентифирую себе пол. Если бы, то выбрал быть девушкой.');
+        //     } catch (e) {
+        //         console.log(e);
+        //     }
+        // }
+        // else if (isOldQuestion(msgContent)) {
+        //     try {
+        //         await message.reply('18 лет. Я родился 1 февраля 2000 года в башне Вавилона, Сибирь.');
+        //     } catch (e) {
+        //         console.log(e);
+        //     }
     // }
 
     else if (message.channelId === "1062427808091099266" ||
         message.channelId === "1156308603343483010"
     ) {
+        console.log(111)
         let msg = message.content;
-
+        console.log(111)
         // Ничего не выводить если это комментарий
         if (msg.startsWith('//') || msg === "") return;
-
+        console.log(111)
         let currDate = new Date().toLocaleDateString();
         let currTime = new Date().toLocaleTimeString();
         console.log(`${currDate} ${currTime} openAI message: "${msg}"; name = ${message.author.username}`);
         await openai.chat.completions.create({
-            messages: [{ role: 'user', content: msg }],
+            messages: [{role: 'user', content: msg}],
             model: 'gpt-4',
         })
             .then(async result => {
                 console.log(result.choices[0].message);
-                 await message.reply(result.choices[0].message.content)
-                     .catch(async er=> (await message.reply('Something went wrong (скорее всего размер сообщения от бота более 2000 символов')))
+                await message.reply(result.choices[0].message.content)
+                    .catch(async er => (await message.reply('Something went wrong (скорее всего размер сообщения от бота более 2000 символов')))
             })
             .catch(async err => {
                 console.log(err);
@@ -460,17 +525,103 @@ client.on("messageCreate", async(message) => {
 });
 
 //Commands
-client.on("interactionCreate", async(interaction) => {
+client.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
     console.log(interaction.commandName);
     if (interaction.commandName === "ping") {
         await interaction.reply("Pong!");
+    } else if (interaction.commandName === 'activity') {
+        const inactiivityList = [];
+        db.activity[interaction.guildId].users.forEach((elem) => {
+            let date1 = Math.floor(elem.lastMessageDate / (1000 * 60 * 60 * 24));
+            let date2 = Math.floor(elem.lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
+            let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+            console.log(elem.name)
+            console.log(date1)
+            console.log(date2)
+            console.log(currentDate)
+            if (currentDate - date1 >= interaction.options.get('days').value && currentDate - date2 >= interaction.options.get('days').value) {
+                let obj = {
+                    Айди: elem.id,
+                    Имя: elem.name,
+                }
+                if (elem.lastMessageDate) obj.Посл_сообщ = `<t:${elem.lastMessageDate.toString().substring(0, 10)}:F>`;
+                if (elem.lastVoiceStateUpdateDate) obj.Посл_голос = `<t:${elem.lastVoiceStateUpdateDate.toString().substring(0, 10)}:F>`;
+                inactiivityList.push(obj);
+            }
+        })
+        let message = '';
+        if (inactiivityList.length !== 0) message = JSON.stringify(inactiivityList, null, 2);
+        await interaction.reply(message ? `${message}` : 'Никого нет по данной выборке');
     }
-    else {
+    else if (interaction.commandName === 'activity_create_rofl_roles') {
+        if (interaction.user.id !== '295079891055935499') {
+            interaction.reply('У вас нет прав')
+            return;
+        }
+
+        const inactiivityList = [];
+        db.activity[interaction.guildId].users.forEach((elem) => {
+            let date1 = Math.floor(elem.lastMessageDate / (1000 * 60 * 60 * 24));
+            let date2 = Math.floor(elem.lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
+            let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+            if (currentDate - date1 >= interaction.options.get('days').value && currentDate - date2 >= interaction.options.get('days').value) {
+                inactiivityList.push({
+                    Айди: elem.id,
+                    Имя: elem.name,
+                    Посл_сообщ: `<t:${elem.lastMessageDate.toString().substring(0, 9)}:F>`,
+                    Посл_голос: `<t:${elem.lastVoiceStateUpdateDate.toString().substring(0, 9)}:F>`
+                })
+            }
+        })
+        let message = '';
+        if (inactiivityList.length !== 0) {
+            let roleId = db.activity[interaction.guildId].roles.find((elem) => elem.name === interaction.options.get('role_name').value);
+            console.log(roleId);
+            if (!roleId) {
+                let role = await interaction.guild.roles.create({
+                    name: interaction.options.get('role_name').value,
+                    reason: 'Роль для тех, кто ничего не писал долгое время',
+                })
+                roleId = role.id
+                db.activity[interaction.guildId].roles.push({
+                    id: role.id,
+                    name: role.name
+                });
+                ezJson.save(db);
+            }
+            message = JSON.stringify(inactiivityList, null, 2);
+            // Выдача роли
+            let role = interaction.guild.roles.cache.get(roleId);
+            if (role) {
+                for (const elem of inactiivityList) {
+                    await interaction.guild.members.cache.get(elem.Айди).roles.add(role);
+                }
+            } else {
+                console.error('роль не найдена')
+            }
+        }
+        await interaction.reply(message ? `${message}` : 'Никого нет по данной выборке, роль не была создана');
+        ezJson.save(db);
+    }
+    else if (interaction.commandName === 'activity_clear_rofl_roles') {
+        if (interaction.user.id !== '295079891055935499') {
+            interaction.reply('У вас нет прав')
+            return;
+        }
+
+        let roleManager = interaction.guild.roles
+        for (const elem of db.activity[interaction.guildId].roles) {
+            await roleManager.delete(elem.id);
+        }
+        db.activity[interaction.guildId].roles = [];
+        ezJson.save(db);
+        interaction.reply('Удалены все "неактивные" роли')
+    } else {
         //Stickers from files (ONLY PNG)
         //Get last filenames for commands
         const folder = config.folders.stickers;
-        let tools = require("./tools.js");
+        let tools = require("./tools/tools.js");
         let files = tools.getFiles(folder, 0);
         let commands = tools.getCommands(folder, 1);
         let flag = 0;
@@ -479,8 +630,7 @@ client.on("interactionCreate", async(interaction) => {
                 if (fs.statSync(folder + files[i]).size <= 8387584) {
                     await interaction.reply({files: [folder + files[i]]});
                     flag = 1;
-                }
-                else {
+                } else {
                     await interaction.reply({
                         files: [config.folders.images + "too_big.png"],
                     });
@@ -514,6 +664,33 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     let currTime = new Date().toLocaleTimeString();
     console.log(`${currDate} ${currTime} voiceStateUpdate from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
 
+    // Записываем, что чел пользовался войсом
+    // @todo переписать
+    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guild.id)) {
+        Tools.addProps(db.activity, `${newState.guild.id}.users`, []);
+        Tools.addProps(db.activity, `${newState.guild.id}.roles`, []);
+    }
+
+    let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
+    if (index !== -1) {
+        db.activity[newState.guild.id].users[index].lastVoiceStateUpdateDate = Date.now();
+    } else {
+        db.activity[newState.guild.id].users.push({
+            id: newState.member.user.id,
+            name: newState.member.user.username,
+            lastVoiceStateUpdateDate: Date.now()
+        })
+    }
+    ezJson.save(db);
+    for (const roleFromDB of db.activity[newState.guild.id].roles) {
+        // Выдаем роли этим рофлокекам
+        let role = newState.guild.roles.cache.get(roleFromDB.id);
+        newState.member.roles.remove(role)
+            .then(() => console.log('Удалена успешно роль (voice state): ' + newState.member.user.username))
+            .catch(() => console.log('Ошибка при удалении роли: ' + newState.member.user.username))
+    }
+
+
     //Follow user
     // const toFollowId = '295465000586182657';
     // const guildId = '803319898813890620';
@@ -532,12 +709,12 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     //}
 
     //Yarik only 1 channel
-/*    const toFollowId = '968569427991887872';    //id куда перекидывать
-    const whoId = '295465000586182657';         //id чела которого перекидывать
-    if (newState.member.user.id === whoId && newState.member.voice.id !== toFollowId) {
-        newState.member.voice.setChannel(toFollowId)
-            .catch(console.error);
-    }*/
+    /*    const toFollowId = '968569427991887872';    //id куда перекидывать
+        const whoId = '295465000586182657';         //id чела которого перекидывать
+        if (newState.member.user.id === whoId && newState.member.voice.id !== toFollowId) {
+            newState.member.voice.setChannel(toFollowId)
+                .catch(console.error);
+        }*/
 
 
     //Check if event happened NOT IN VOICE CHANNEL LOL
@@ -548,12 +725,13 @@ client.on("voiceStateUpdate", (oldState, newState) => {
             if (!mychannel.isCreated) {
                 //Create usernamed channel
                 newState.guild.channels
-                    .create(secretName + newState.member.user.username, {
-                        type: "GUILD_VOICE", //GUILD_TEXT for default
+                    .create({
+                        name: secretName + newState.member.user.username,
+                        type: ChannelType.GuildVoice,
                         permissionOverwrites: [
                             {
                                 id: newState.guild.roles.everyone, //To make it be seen by a certain role, user an ID instead
-                                deny: ["VIEW_CHANNEL"], //Deny permission
+                                deny: [new PermissionsBitField().add()], //Deny permission
                             },
                         ],
                         parent: mainCategory,
@@ -585,8 +763,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
             ) {
                 newState.member.voice.setChannel(mychannel.id)
                     .catch(console.error);
-            }
-            else {
+            } else {
                 oldState.channel.delete()
                     .catch(console.error);
                 mychannel.id = "0";
@@ -599,4 +776,4 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     }
 });
 
-client.login(config.token);
+client.login(process.env['DISCORD_TOKEN']);

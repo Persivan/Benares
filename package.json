@@ -1,18 +1,27 @@
 {
+  "name": "benares",
+  "version": "1.0.0",
+  "description": "Discord bot",
+  "main": "index.js",
   "scripts": {
-    "start": "node ."
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Persivan/Benares.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Persivan/Benares/issues"
+  },
+  "homepage": "https://github.com/Persivan/Benares#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.5.3",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "@discordjs/voice": "^0.6.0",
-    "discord-api-types": "^0.23.1",
-    "discord.js": "^13.1.0",
-    "ffmpeg-static": "^4.4.0",
-    "libsodium-wrappers": "^0.7.9",
-    "openai": "^4.10.0",
-    "puppeteer": "^13.0.1",
-    "soap": "^1.0.0",
-    "tweetnacl": "^1.0.3"
+    "@discordjs/builders": "^1.6.5",
+    "@discordjs/rest": "^2.0.1",
+    "discord-api-types": "^0.37.61",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "openai": "^4.14.1"
   }
 }
