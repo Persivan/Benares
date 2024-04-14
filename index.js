@@ -208,6 +208,7 @@ client.on("messageCreate", async (message) => {
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
         Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
+        Tools.addProps(db.activity, `${message.guildId}.afkUserRoleId`, "");
     }
     // Обновление даты
     let index = db.activity[message.guildId].users.findIndex((elem) => elem.id === message.author.id)
@@ -606,10 +607,11 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     console.log(`${currDate} ${currTime} voiceStateUpdate from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
     
     // обновление БД при активации голоса
-    // Добавление goodUserRoleId, users
+    // Добавление goodUserRoleId, users, afkUserRoleId
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guildId)) {
         Tools.addProps(db.activity, `${newState.guildId}.users`, []);
         Tools.addProps(db.activity, `${newState.guildId}.goodUserRoleId`, "");
+        Tools.addProps(db.activity, `${newState.guildId}.afkUserRoleId`, "");
     }
     let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
     if (index !== -1) {

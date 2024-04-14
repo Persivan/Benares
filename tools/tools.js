@@ -126,7 +126,6 @@ module.exports = {
     },
 
     isObjHaveRolesAndUsersArrays(obj, guildId) {
-        console.log((Object.hasOwn(obj, guildId) && Object.hasOwn(obj[guildId], 'roles') && Object.hasOwn(obj[guildId], 'users')))
-        return (Object.hasOwn(obj, guildId) && Object.hasOwn(obj[guildId], 'roles') && Object.hasOwn(obj[guildId], 'users'));
+        return (Object.hasOwn(obj, guildId) && Object.hasOwn(obj[guildId], 'goodUserRoleId') && Object.hasOwn(obj[guildId], 'users') && Object.hasOwn(obj[guildId], 'afkUserRoleId'));
     }
 };
