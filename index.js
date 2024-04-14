@@ -24,6 +24,8 @@ const ezJson = require('./tools/ezJson')
 ezJson.openFile('./db.json');
 const db = ezJson.getObj();
 
+// Импорт реакций на сообщения
+const goodRoleHandler = require('./messageCreate/goodRole.js');
 
 const games = [
     "Honkai Impact 3",
@@ -148,26 +150,26 @@ const videos = [
 //custom status doesnt work yet https://stackoverflow.com/questions/58568377/how-can-i-set-custom-status-in-discord-bot-according-to-new-update
 const custom = ["I am Benares, HoV's dragon", "Dragoon"];
 
+
 //Change status every 480 seconds and registr commands
 client.on("ready", () => {
     //Register commands
     let reg_com = require("./tools/reg_com.js");
     reg_com(0);
     // run every 480 seconds
-    // run every 480 seconds
     setInterval(async () => {
-        //Register commands
+        // Register commands
         let reg_com = require("./tools/reg_com.js");
         reg_com(0);
 
-        //Update server icon
+        // Update server icon
         // let mainGuild = client.guilds.cache.get('803319898813890620');
         // let index = Math.floor(Math.random() * icons.length);
         // mainGuild.setIcon(icons[index])
         //     .then(updated => console.log('Icon updated!!' + index))
         //     .catch(console.error);
 
-        //Change status
+        // Change status
         // generate random number between 1 and list length.
         let randomType = Math.floor(Math.random() * 3);
         if (randomType == 0) {
@@ -187,71 +189,8 @@ client.on("ready", () => {
             });
         }
 
-
-        // Выдача рофлокек ролей
-        console.log('Начинаю выдачу рофлокек ролей');
-        client.guilds.cache.forEach((guild) => {
-            console.log('ПУСТО')
-            console.log(guild.id)
-            if (!config.guilds.some((elem) => elem.id === guild.id && elem.autoRoflRole)) return;
-
-            console.log('Нашелся сервер смертников');
-            console.log(guild.name);
-            if (db.activity[guild.id].roles.length === 0) {
-                console.log('На сервере еще нет роли для рофлокеков')
-                return;
-            }
-            console.log('На сервере есть топ роль')
-            for (const roleFromDB of db.activity[guild.id].roles) {
-                console.log('Роль: ' + roleFromDB.name)
-                // Выдаем роли этим рофлокекам
-                let role = guild.roles.cache.get(roleFromDB.id);
-                guild.members.list()
-                    .then((list) => {
-                        list.forEach((member) => {
-                            // Выдаем роль, если чел есть в бд и у него последняя активность более 14 дней ИЛИ если его нет в БД
-                            let inActive = false;
-                            index = db.activity[guild.id].users.findIndex((elem) => elem.id === member.user.id)
-
-                            // Добавляем рофлороль его нет в бд
-                            if (index === -1) {
-                                console.log('Чела нет в БД: ' + member.user.username)
-                                member.roles.add(role);
-                                return;
-                            }
-                            // console.log(index);
-                            // console.log(guild.id);
-                            // console.log(db.activity);
-                            // console.log(db.activity[guild.id]);
-                            console.log(db.activity[guild.id].users[index]);
-                            let date1 = Math.floor(db.activity[guild.id].users[index].lastMessageDate / (1000 * 60 * 60 * 24));
-                            let date2 = Math.floor(db.activity[guild.id].users[index].lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
-                            let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-                            console.log('Чел из бд')
-                            console.log(db.activity[guild.id].users[index].name)
-                            console.log(date1)
-                            console.log(date2)
-                            console.log(currentDate)
-                            console.log('Кончился чел из бд')
-
-                            if (date1 && currentDate - date1 >= 14 && date2 && currentDate - date2 >= 14) inActive = true;
-
-                            console.log(member.user.username);
-                            console.log(index);
-                            console.log(inActive);
-
-                            // Добавляем рофлороль он неактивен
-                            if (inActive) {
-                                console.log('Чел найден ' + member.user.username)
-                                member.roles.add(role);
-                            }
-                        })
-                    }
-                )
-            }
-            console.log('Успешно выданы роли рофлокеков: ' + guild.name);
-        })
-        console.log('Закончил выдачу рофлокек ролей');
+        // Забираем/выдаем роль
+        goodRoleHandler(client, db, config)
 
     }, 480000);
     console.log(`Logged in as ${client.user.tag}!`);
@@ -264,12 +203,13 @@ client.on("messageCreate", async (message) => {
     // Защита, чтобюы бот не отвечал самому себе
     if (message.author.bot) return;
 
-    // @todo переписать
+    // обновление БД при написание сообщения
+    // Добавление goodUserRoleId, users
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
-        Tools.addProps(db.activity, `${message.guildId}.roles`, []);
+        Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
     }
-
+    // Обновление даты
     let index = db.activity[message.guildId].users.findIndex((elem) => elem.id === message.author.id)
     if (index !== -1) {
         db.activity[message.guildId].users[index].lastMessageDate = Date.now();
@@ -281,12 +221,13 @@ client.on("messageCreate", async (message) => {
         })
     }
     ezJson.save(db);
-    for (const roleFromDB of db.activity[message.guildId].roles) {
-        // Выдаем роли этим рофлокекам
-        let role = message.guild.roles.cache.get(roleFromDB.id);
-        message.member.roles.remove(role)
-            .then(() => console.log('Удалена успешно роль (сообщение): ' + message.author.username))
-            .catch(() => console.log('Ошибка при удалении роли: ' + message.author.username))
+
+
+    // Тест для удаления роли
+    if (message.content === 'rolestest') {
+        if (message.author.id === "295079891055935499") goodRoleHandler(client, db, config)
+        else message.reply("Не хватает прав!")
+                .catch(console.error);
     }
 
 
@@ -663,14 +604,13 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     let currDate = new Date().toLocaleDateString();
     let currTime = new Date().toLocaleTimeString();
     console.log(`${currDate} ${currTime} voiceStateUpdate from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
-
-    // Записываем, что чел пользовался войсом
-    // @todo переписать
-    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guild.id)) {
-        Tools.addProps(db.activity, `${newState.guild.id}.users`, []);
-        Tools.addProps(db.activity, `${newState.guild.id}.roles`, []);
+    
+    // обновление БД при активации голоса
+    // Добавление goodUserRoleId, users
+    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guildId)) {
+        Tools.addProps(db.activity, `${newState.guildId}.users`, []);
+        Tools.addProps(db.activity, `${newState.guildId}.goodUserRoleId`, "");
     }
-
     let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
     if (index !== -1) {
         db.activity[newState.guild.id].users[index].lastVoiceStateUpdateDate = Date.now();
@@ -682,14 +622,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         })
     }
     ezJson.save(db);
-    for (const roleFromDB of db.activity[newState.guild.id].roles) {
-        // Выдаем роли этим рофлокекам
-        let role = newState.guild.roles.cache.get(roleFromDB.id);
-        newState.member.roles.remove(role)
-            .then(() => console.log('Удалена успешно роль (voice state): ' + newState.member.user.username))
-            .catch(() => console.log('Ошибка при удалении роли: ' + newState.member.user.username))
-    }
-
 
     //Follow user
     // const toFollowId = '295465000586182657';

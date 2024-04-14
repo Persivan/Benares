@@ -1,8 +1,8 @@
 module.exports = {
     folders: {
-        stickers: "../assets/stickers/",
-        images: "../assets/",
-        emoji: "../assets/emoji/"
+        stickers: "./assets/stickers/",
+        images: "./assets/",
+        emoji: "./assets/emoji/"
     },
 
     // @todo убрать отсюда
@@ -19,6 +19,5 @@ module.exports = {
             id: '539510638372716605',  // devityi test server
             autoRoflRole: false
         },
-
     ]
 }
