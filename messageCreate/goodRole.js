@@ -38,8 +38,13 @@ module.exports = (client, db, config) => {
                     });
 
                     list.forEach((member) => {
-                        // Получаем индекс из БД
-                        let inActive = false;
+
+                        // Выходим если сервера нет в config'е
+                        if (!db.activity[guild.id]) {
+                            console.log('[roles] сервера не в config файле: ' + guild.id);
+                            return;
+                        }
+
                         index = db.activity[guild.id].users.findIndex((elem) => elem.id === member.user.id)
 
                         // Если чела нет в бд и сервер не должен выдавать роль афк для несуществующих челов
@@ -58,8 +63,8 @@ module.exports = (client, db, config) => {
                         let date2 = Math.floor(db.activity[guild.id].users[index].lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
                         let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
 
-                        // Если чел существует в бд и он не был активен более 14 дней
-                        if ((date2 && currentDate - date2 < 14) && (date1 && currentDate - date1 < 14)) {
+                        // Если чел существует в бд и он был активен за последние 14 дней
+                        if ((date2 && currentDate - date2 < 14) || (date1 && currentDate - date1 < 14)) {
                             if (autoRoflRole)
                                 member.roles.add(roleGood)
                                     .then(() => console.log('[roles] autoRoflRole Роль успешно добавлена: ', member.user.id, ' ник: ', member.user.globalName))
@@ -80,6 +85,7 @@ module.exports = (client, db, config) => {
                                     .catch(() => console.log('[roles] afkRoflRole Ошибка при добавление: ', member.user.id, ' ник: ', member.user.globalName))
                         }
 
+                        // Если чела не существует в бд
                         if (notExistMeansAfk && !date2 && !date1) {
                             if (autoRoflRole)
                                 member.roles.remove(roleGood)
@@ -92,6 +98,7 @@ module.exports = (client, db, config) => {
                         }
                     })
                 })
+                .catch(() => console.log('[roles] Ошибка при получение списка челов с сервера'))
         })
         console.log('[roles] Закончил выдачу рофлокек ролей')
 };

@@ -10,7 +10,7 @@ module.exports = {
         {
             id: '803319898813890620',  // Eventurika
             autoRoflRole: true,
-            afkRoflRole: false,
+            afkRoflRole: true,
             notExistMeansAfk: false
         },
         {
