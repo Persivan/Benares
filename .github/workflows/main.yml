@@ -13,7 +13,7 @@ jobs:
     name: SAST scan (NodeJsScan)
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [Linux, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout the code
@@ -35,7 +35,7 @@ jobs:
     name: Build Image and Run Image Scan
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [Linux, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
