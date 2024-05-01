@@ -4,5 +4,5 @@ npm-debug.log
 README.md
 .gitignore
 .dockerignore
-db.json.
+db.json
 assets
