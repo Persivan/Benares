@@ -9,9 +9,13 @@ on:
     - main
 
 jobs:
+
   image_scan:
+    strategy:
+      matrix:
+        os: [Linux, ubuntu-latest]
     name: Build Image and Run Image Scan
-    runs-on: [ Linux, X64 ]
+    runs-on: ${{ matrix.os }}
 
     steps:
 
