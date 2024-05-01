@@ -9,16 +9,31 @@ on:
     - main
 
 jobs:
-
-  image_scan:
+  njsscan:
+    name: SAST scan (NodeJsScan)
     strategy:
       matrix:
         os: [Linux, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+      
+    - name: nodejsscan scan
+      id: njsscan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: '.'
+
+  
+  image_scan:
     name: Build Image and Run Image Scan
+    strategy:
+      matrix:
+        os: [Linux, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
-    
     - name: Checkout code
       uses: actions/checkout@v2
 
