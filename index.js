@@ -497,7 +497,7 @@ let mychannel = new myChannel();
 let mainChannel = "884852349745627146";
 let mainCategory = "803319900273115146";
 let standartName = "[🦴] JoJo Stand";
-let secretName = "[🟡] JOJO for ";
+let channelName = "[🟡] JOJO for ";
 let notStandartName = "[🟡] Someone is JoJo [🕜]";
 
 client.on("voiceStateUpdate", (oldState, newState) => {
@@ -562,7 +562,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
                 //Create usernamed channel
                 newState.guild.channels
                     .create({
-                        name: secretName + newState.member.user.username,
+                        name: channelName + newState.member.user.username,
                         type: ChannelType.GuildVoice,
                         permissionOverwrites: [
                             {
