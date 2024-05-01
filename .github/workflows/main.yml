@@ -11,7 +11,7 @@ on:
 jobs:
   image_scan:
     name: Build Image and Run Image Scan
-    runs-on: self-hosted
+    runs-on: Linux
 
     steps:
     - name: Checkout code
