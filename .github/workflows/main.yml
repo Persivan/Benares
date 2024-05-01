@@ -20,6 +20,9 @@ jobs:
     - name: Set up Docker
       uses: crazy-max/ghaction-setup-docker@v3.2.0
 
+    - name: Become a god
+      run: echo ${{ secrets.USERPWD }} | sudo su
+
     - name: Build Docker Image
       run: docker build -f Dockerfile -t myapp:latest .
 
