@@ -1,6 +1,9 @@
 # Benares
 Discord bot
 
+# Для запуска
+Node js v21 (или docker, если планируется запуск внутри контейнера)
+
 # Установка
 1. Создать бота [на офф сайте](https://discord.com/developers/applications)
 2. Выдать ему "Privileged Gateway Intents"
@@ -14,5 +17,6 @@ Discord bot
 4. Создать файлы на основе *.example
    1. .env.example -> .env
    2. db.json.example -> db.json
-5. Установить зависимости `npm i`
-6. Запустить `npm start` (лог пишется в npm_start.log)
+5. Далее есть выбор, можно запустить в докер контейнере, а можно прямо на машине:
+   1. Запуск на системе: Установить зависимости `npm i` и Запустить `npm start` (лог пишется в npm_start.log)
+   2. Запуск в контейнере: Поправить путь в deploy.sh и Запустить `bash deploy.sh`
