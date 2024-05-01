@@ -1,0 +1,18 @@
+{
+  "activity": {
+    "1235219267226697811": {
+      "users": [
+        {
+          "id": "295079891055935499",
+          "name": "persivan",
+          "lastMessageDate": 1714572078494
+        }
+      ],
+      "goodUserRoleId": "",
+      "afkUserRoleId": "",
+      "autoRoflRole": true,
+      "afkRoflRole": true,
+      "notExistMeansAfk": false
+    }
+  }
+}

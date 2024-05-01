@@ -1,6 +1,6 @@
 module.exports = (client, db, config) => {
         // Забрать роль успешного человека
-        console.log('[roles] Забираю роль');
+        console.log('[roles] Началась обработка ролей');
         client.guilds.cache.forEach((guild) => {
             console.log('[roles] Нашелся сервер: ', guild.name);
 
@@ -17,10 +17,10 @@ module.exports = (client, db, config) => {
                 console.log('[roles] Нет роли для выдачи хорошей');
                 return;
             }
-            // Если в конфиге стоит не использовать функционал, ничего не делаем
-            let afkRoflRole = config.guilds.some((elem) => elem.id === guild.id && elem.afkRoflRole)
-            let autoRoflRole = config.guilds.some((elem) => elem.id === guild.id && elem.autoRoflRole)
-            let notExistMeansAfk = config.guilds.some((elem) => elem.id === guild.id && elem.notExistMeansAfk) // Если чела нет в бд, значит он афк
+            // Если в бд стоит не использовать функционал, ничего не делаем
+            let afkRoflRole = db.activity[guild.id].afkRoflRole
+            let autoRoflRole = db.activity[guild.id].autoRoflRole
+            let notExistMeansAfk = db.activity[guild.id].notExistMeansAfk // Если чела нет в бд, значит он афк
             if (!afkRoflRole && !autoRoflRole) return;
 
             // Получаем обьект роли

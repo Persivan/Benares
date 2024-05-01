@@ -155,12 +155,12 @@ const custom = ["I am Benares, HoV's dragon", "Dragoon"];
 client.on("ready", () => {
     //Register commands
     let reg_com = require("./tools/reg_com.js");
-    reg_com(0);
+    reg_com(0, client.user.id);
     // run every 480 seconds
     setInterval(async () => {
         // Register commands
         let reg_com = require("./tools/reg_com.js");
-        reg_com(0);
+        reg_com(0, client.user.id);
 
         // Update server icon
         // let mainGuild = client.guilds.cache.get('803319898813890620');
@@ -175,13 +175,15 @@ client.on("ready", () => {
         if (randomType == 0) {
             let randomIndex = Math.floor(Math.random() * games.length);
             client.user.setActivity(games[randomIndex]);
-        } else if (randomType == 1) {
+        }
+        else if (randomType == 1) {
             let randomIndex = Math.floor(Math.random() * music.length);
             client.user.setActivity(music[randomIndex][0], {
                 type: "STREAMING",
                 url: music[randomIndex][1],
             });
-        } else if (randomType == 2) {
+        }
+        else if (randomType == 2) {
             let randomIndex = Math.floor(Math.random() * videos.length);
             client.user.setActivity(videos[randomIndex][0], {
                 type: "STREAMING",
@@ -209,12 +211,16 @@ client.on("messageCreate", async (message) => {
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
         Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${message.guildId}.afkUserRoleId`, "");
+        Tools.addProps(db.activity, `${message.guildId}.autoRoflRole`, false);
+        Tools.addProps(db.activity, `${message.guildId}.afkRoflRole`, false);
+        Tools.addProps(db.activity, `${message.guildId}.notExistMeansAfk`, false);
     }
     // Обновление даты
     let index = db.activity[message.guildId].users.findIndex((elem) => elem.id === message.author.id)
     if (index !== -1) {
         db.activity[message.guildId].users[index].lastMessageDate = Date.now();
-    } else {
+    }
+    else {
         db.activity[message.guildId].users.push({
             id: message.author.id,
             name: message.author.username,
@@ -222,15 +228,6 @@ client.on("messageCreate", async (message) => {
         })
     }
     ezJson.save(db);
-
-
-    // Тест для удаления роли
-    if (message.content === 'rolestest') {
-        if (message.author.id === "295079891055935499") goodRoleHandler(client, db, config)
-        else message.reply("Не хватает прав!")
-                .catch(console.error);
-    }
-
 
     if (message.content === "test") {
         message
@@ -244,6 +241,19 @@ client.on("messageCreate", async (message) => {
         client.users.fetch("295079891055935499", false).then((user) => {
             user.send("Test msg " + message.author.username);
         });
+    }
+    else if (message.content === "бот ливай") {
+        message
+            .reply("yes, honey")
+            .then(() =>
+                console.log(
+                    `Replied to message "${message.content}" from "${message.author.username}"`
+                )
+            )
+            .catch(console.error);
+        message.guild.leave()
+            .then(guild => console.log(`Left the guild: ${guild.name}`))
+            .catch(console.error);
     }
 
         // Реакция на упоминание сообщений бота
@@ -281,103 +291,12 @@ client.on("messageCreate", async (message) => {
         //         .catch(console.error);
         //     return;
     // }
-    else if (message.content === "yatta") {
-        if (message.author.id === "295079891055935499") {
-            message.delete();
-            message.channel
-                .send({files: [config.folders.images + "/yatta_emoji.png"]})
-                .then(() =>
-                    console.log(
-                        `Send message on "${message.content}" from "${message.author.username}"`
-                    )
-                )
-                .catch(console.error);
-        } else {
-            message.delete();
-            message.channel
-                .send({files: [config.folders.images + "/yatta_2.jpg"]})
-                .then(() =>
-                    console.log(
-                        `Send message on "${message.content}" from "${message.author.username}"`
-                    )
-                )
-                .catch(console.error);
-        }
-    } else if (message.content === "say yatta") {
-        message.delete();
-        message.channel
-            .send({files: [config.folders.images + "/say_yatta.jpg"]})
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "thinking") {
-        message.delete();
-        message.channel
-            .send({files: [config.folders.images + "/thinking_kiana.jpg"]})
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "hi") {
-        message.delete();
-        message.channel
-            .send({files: [config.folders.images + "/hi_kiana.png"]})
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "not yatta") {
-        message.delete();
-        message.channel
-            .send({files: [config.folders.images + "/not_yatta.jpg"]})
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "help") {
-        message.channel
-            .send("test, yatta, not yatta, help")
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "no fear") {
-        message.delete();
-        message.channel
-            .send({files: [config.folders.images + "/no_fear.png"]})
-            .then(() =>
-                console.log(
-                    `Send message on "${message.content}" from "${message.author.username}"`
-                )
-            )
-            .catch(console.error);
-    } else if (message.content === "del" && message.author.id === "295079891055935499") {
+
+    else if (message.content === "del" && message.author.id === "295079891055935499") {
         message.channel.bulkDelete(11);
-    } else if (message.content === 'ipdate') {
-        //Update server icon
-        let mainGuild = client.guilds.cache.get('803319898813890620');
-        let index = Math.floor(Math.random() * icons.length);
-        mainGuild.setIcon(icons[index])
-            .then(updated => console.log('Icon updated!!' + index))
-            .catch(console.error);
-    } else if (message.content === 'reg_com' && message.author.id === '295079891055935499') {
-        let reg_com = require("./tools/reg_com.js");
-        reg_com(1);
-        message.channel.send("Complete!");
     }
 
-        // Кик с сервера за сообщения без упоминаний в мейне
+        // Кик с сервера за сообщения без текста, но с упоминанием в мейне
         // else if (message.mentions.users.size !== 0 && message.channel.id === '803321395458605056') {
         //     let msg = message.content;
         //     let attachments_size = message.attachments.size;
@@ -406,32 +325,8 @@ client.on("messageCreate", async (message) => {
         //         //}
         //
         //     }
-        // }
-
-
-        // OpenAI чат
-
-        // else if (isNameQuestion(msgContent)) {
-        //     try {
-        //         await message.reply('Меня зовут Бенарес.');
-        //     } catch (e) {
-        //         console.log(e);
-        //     }
-        // }
-        // else if (isSexQuestion(msgContent)) {
-        //     try {
-        //         await message.reply('Я не идентифирую себе пол. Если бы, то выбрал быть девушкой.');
-        //     } catch (e) {
-        //         console.log(e);
-        //     }
-        // }
-        // else if (isOldQuestion(msgContent)) {
-        //     try {
-        //         await message.reply('18 лет. Я родился 1 февраля 2000 года в башне Вавилона, Сибирь.');
-        //     } catch (e) {
-        //         console.log(e);
-        //     }
     // }
+
 
     else if (message.channelId === "1062427808091099266" ||
         message.channelId === "1156308603343483010"
@@ -464,7 +359,7 @@ client.on("messageCreate", async (message) => {
 
             })
     }
-});
+})
 
 //Commands
 client.on("interactionCreate", async (interaction) => {
@@ -472,7 +367,8 @@ client.on("interactionCreate", async (interaction) => {
     console.log(interaction.commandName);
     if (interaction.commandName === "ping") {
         await interaction.reply("Pong!");
-    } else if (interaction.commandName === 'activity') {
+    }
+    else if (interaction.commandName === 'activity') {
         const inactiivityList = [];
         db.activity[interaction.guildId].users.forEach((elem) => {
             let date1 = Math.floor(elem.lastMessageDate / (1000 * 60 * 60 * 24));
@@ -539,7 +435,8 @@ client.on("interactionCreate", async (interaction) => {
                 for (const elem of inactiivityList) {
                     await interaction.guild.members.cache.get(elem.Айди).roles.add(role);
                 }
-            } else {
+            }
+            else {
                 console.error('роль не найдена')
             }
         }
@@ -559,7 +456,8 @@ client.on("interactionCreate", async (interaction) => {
         db.activity[interaction.guildId].roles = [];
         ezJson.save(db);
         interaction.reply('Удалены все "неактивные" роли')
-    } else {
+    }
+    else {
         //Stickers from files (ONLY PNG)
         //Get last filenames for commands
         const folder = config.folders.stickers;
@@ -572,7 +470,8 @@ client.on("interactionCreate", async (interaction) => {
                 if (fs.statSync(folder + files[i]).size <= 8387584) {
                     await interaction.reply({files: [folder + files[i]]});
                     flag = 1;
-                } else {
+                }
+                else {
                     await interaction.reply({
                         files: [config.folders.images + "too_big.png"],
                     });
@@ -605,18 +504,22 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     let currDate = new Date().toLocaleDateString();
     let currTime = new Date().toLocaleTimeString();
     console.log(`${currDate} ${currTime} voiceStateUpdate from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
-    
+
     // обновление БД при активации голоса
     // Добавление goodUserRoleId, users, afkUserRoleId
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guildId)) {
         Tools.addProps(db.activity, `${newState.guildId}.users`, []);
         Tools.addProps(db.activity, `${newState.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${newState.guildId}.afkUserRoleId`, "");
+        Tools.addProps(db.activity, `${newState.guildId}.autoRoflRole`, false);
+        Tools.addProps(db.activity, `${newState.guildId}.afkRoflRole`, false);
+        Tools.addProps(db.activity, `${newState.guildId}.notExistMeansAfk`, false);
     }
     let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
     if (index !== -1) {
         db.activity[newState.guild.id].users[index].lastVoiceStateUpdateDate = Date.now();
-    } else {
+    }
+    else {
         db.activity[newState.guild.id].users.push({
             id: newState.member.user.id,
             name: newState.member.user.username,
@@ -649,7 +552,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
             newState.member.voice.setChannel(toFollowId)
                 .catch(console.error);
         }*/
-
 
     //Check if event happened NOT IN VOICE CHANNEL LOL
     if (newState.member.voice.channel !== undefined) {
@@ -697,7 +599,8 @@ client.on("voiceStateUpdate", (oldState, newState) => {
             ) {
                 newState.member.voice.setChannel(mychannel.id)
                     .catch(console.error);
-            } else {
+            }
+            else {
                 oldState.channel.delete()
                     .catch(console.error);
                 mychannel.id = "0";
