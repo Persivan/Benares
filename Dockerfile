@@ -11,4 +11,4 @@ RUN npm install
 COPY . .
 
 # Запуск проекта
-CMD [ "node", "index.js" ]
+CMD [ "npm", "start" ]

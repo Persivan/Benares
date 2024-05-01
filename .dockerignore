@@ -6,3 +6,4 @@ README.md
 .dockerignore
 db.json
 assets
+npm_start.log
