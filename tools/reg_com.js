@@ -1,7 +1,9 @@
-//Creating commands for bot with Params from token.js
-const {SlashCommandBuilder} = require("@discordjs/builders");
-const {Routes} = require("discord-api-types/v9");
-module.exports = function (debug = 0) {
+module.exports = function (debug = 0, discordUserId) {
+    if (!discordUserId) {
+        console.log('discordUserId is null!');
+        return;
+    }
+
     const {REST} = require("@discordjs/rest");
     const {Routes} = require("discord-api-types/v9");
     const {SlashCommandBuilder} = require("@discordjs/builders");
@@ -9,23 +11,23 @@ module.exports = function (debug = 0) {
     //Params
     let info = require("../config");
 
-    //Standart commands
+
+    // Get guilds
+    const ezJson = require("./ezJson");
+    ezJson.openFile('./db.json');
+    const {} = require("./ezJson");
+    const { activity } = ezJson.getObj();
+    const guildIds = Object.getOwnPropertyNames(activity);
+    if (!guildIds || !guildIds.length) {
+        console.log('guildIds is null!');
+        return;
+    }
+
+    // Standard commands
     const commands = [
         new SlashCommandBuilder()
             .setName("ping")
-            .setDescription("Replies with Pong!"),
-        new SlashCommandBuilder()
-            .setName("activity")
-            .setDescription("Вычисляет всех неактивных")
-            .addNumberOption((option) => option.setName("days").setDescription("кол-во дней").setRequired(true)),
-        new SlashCommandBuilder()
-            .setName("activity_create_rofl_roles")
-            .setDescription("Выставляет всем неактивным рофло роль (Инактив X дней)")
-            .addNumberOption((option) => option.setName("days").setDescription("кол-во дней").setRequired(true))
-            .addStringOption((option) => option.setName("role_name").setDescription("название роли инактива").setRequired(true)),
-        new SlashCommandBuilder()
-            .setName("activity_clear_rofl_roles")
-            .setDescription("Удаляет все роли инактиверов")
+            .setDescription("Replies with Pong!")
     ];
 
     //Dynamic commands
@@ -57,9 +59,9 @@ module.exports = function (debug = 0) {
             }
 
             // Выставляем команды
-            for (const elem of info.guilds) {
+            for (const guildId of guildIds) {
                 await rest.put(
-                    Routes.applicationGuildCommands(process.env['CLIENT_ID'], elem.id),
+                    Routes.applicationGuildCommands(discordUserId, guildId),
                     {
                         body: commands,
                     }
