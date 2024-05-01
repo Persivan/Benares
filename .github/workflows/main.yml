@@ -37,6 +37,12 @@ jobs:
     # Will not work on self-hosted runners without root permissions (Avoid root permissions)
     - name: Set up Docker
       uses: docker-practice/actions-setup-docker@v1
+      with:
+        docker_buildx: false
+        docker_daemon_json: |
+          {
+            "experimental": false
+          }
 
     - name: Build Docker Image
       run: docker build -f Dockerfile -t myapp:latest .
