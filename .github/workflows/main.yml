@@ -17,13 +17,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Become a god
-      run: echo ${{ secrets.USERPWD }} | sudo su
-
-    - name: Set up Docker
-      uses: crazy-max/ghaction-setup-docker@v3.2.0
-
-
+    # Will not work on self-hosted runners without root permissions (Avoid root perm)
+    # - name: Set up Docker
+      # uses: docker-practice/actions-setup-docker@v1
 
     - name: Build Docker Image
       run: docker build -f Dockerfile -t myapp:latest .
