@@ -16,7 +16,11 @@ jobs:
 
     - name: Stop and remove the old container if it exists
       run: |
-        DOCKER_CONTAINER="benares_container"
+        if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+          DOCKER_CONTAINER="benares_container"
+        else
+          DOCKER_CONTAINER="benares_container_test"
+        fi
         if [ "$(docker ps -a -q -f name=$DOCKER_CONTAINER)" ]; then
          docker stop $DOCKER_CONTAINER
          docker rm $DOCKER_CONTAINER
@@ -24,23 +28,32 @@ jobs:
 
     - name: Stop and remove the old container if it exists
       run: |
-        DOCKER_IMAGE="benares"
+        if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+          DOCKER_IMAGE="benares"
+        else
+          DOCKER_IMAGE="benares_test"
+        fi
         if [ "$(docker images -q $DOCKER_IMAGE)" ]; then
             docker rmi $DOCKER_IMAGE
         fi
     
     - name: Build the Docker image
       run: |
-        DOCKER_IMAGE="benares"
+        if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+          DOCKER_IMAGE="benares"
+        else
+          DOCKER_IMAGE="benares_test"
+        fi
         docker build . --file Dockerfile --tag $DOCKER_IMAGE
 
     - name: Run the Docker container
       run: |
-        DOCKER_CONTAINER="benares_container"
         if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
           DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
+          DOCKER_CONTAINER="benares_container"
         else
           DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_TEST }}
+          DOCKER_CONTAINER="benares_container_test"
         fi
         docker run \
           --detach \
