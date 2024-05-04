@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define environment variables
+# Define environment variables. $(pwd -W) - for windows, $(PWD) for unix
 DISCORD_BOTS_ASSETS="$(pwd -W)/assets"
 DISCORD_BOTS_DB="$(pwd -W)/db.json"
 DISCORD_BOTS_LOG="$(pwd -W)/npm_start.log"
