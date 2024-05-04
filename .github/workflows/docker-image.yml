@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag benares:$(date +%s)
+      run: docker build . --file Dockerfile --tag benares
 
     # Ignoring result, so even with 0 dangling images command will return 0
     - name: Clear dangling Docker images
