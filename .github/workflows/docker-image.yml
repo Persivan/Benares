@@ -11,6 +11,11 @@ jobs:
     runs-on: [Linux, X64]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag benares --rm
+
+    - name: Remove dangling Docker images
+      run: docker rmi $(docker images -f "dangling=true" -q)
