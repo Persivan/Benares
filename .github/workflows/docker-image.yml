@@ -11,6 +11,23 @@ jobs:
     runs-on: [Linux, X64]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag benares:$(date +%s) --no-cache
+
+    - name: Clear dangling Docker images
+      run: docker rmi $(docker images -f "dangling=true" -q)
+
+#    - name: Run the Docker image
+#      run: |
+#        docker run \
+#          -v "$pathToProject/assets:/usr/src/app/assets" \
+#          -v "$pathToProject/db.json:/usr/src/app/db.json" \
+#          -v "$pathToProject/npm_start.log:/usr/src/app/npm_start.log" \
+#          -e "DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_TEST }}" \
+#          -e "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
+#          benares
+
+    
