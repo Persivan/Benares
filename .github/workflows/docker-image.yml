@@ -13,4 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag benares:$(date +%s) --no-cache
+      run: docker build . --file Dockerfile --tag benares
