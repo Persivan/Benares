@@ -36,6 +36,7 @@ jobs:
 
     - name: Run the Docker container
       run: |
+        DOCKER_CONTAINER="benares_container"
         if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
           DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
         else
@@ -46,4 +47,5 @@ jobs:
           -v "/projects/Benares/db.json:/usr/src/app/db.json" \
           -e "DISCORD_TOKEN=$DISCORD_TOKEN" \
           -e "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
+          --name $DOCKER_CONTAINER \
           benares
