@@ -17,8 +17,9 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag benares:$(date +%s) --no-cache
 
+    # Ignoring result, so even with 0 dangling images command will return 0
     - name: Clear dangling Docker images
-      run: docker rmi $(docker images -f "dangling=true" -q)
+      run: docker rmi $(docker images -f "dangling=true" -q) 2>/dev/null || true
 
 #    - name: Run the Docker image
 #      run: |
