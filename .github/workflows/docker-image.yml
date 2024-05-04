@@ -29,5 +29,3 @@ jobs:
 #          -e "DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_TEST }}" \
 #          -e "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
 #          benares
-
-    
