@@ -12,6 +12,9 @@ jobs:
         os: [Linux]
     runs-on: ${{ matrix.os }}
     steps:
+    # Cleanup containers created by the lifetime of a workflow Job
+    - uses: waycarbon/github-action-container-cleanup@v1
+    
     - name: Checkout the code
       uses: actions/checkout@v2
       
@@ -35,6 +38,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    # Cleanup containers created by the lifetime of a workflow Job
+    - uses: waycarbon/github-action-container-cleanup@v1
+    
     - name: Checkout code
       uses: actions/checkout@v2
 
