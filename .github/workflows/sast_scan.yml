@@ -12,6 +12,8 @@ jobs:
         os: [Linux]
     runs-on: ${{ matrix.os }}
     steps:
+    # There is should be cleanup for images 
+    
     - name: Cleanup containers created by the lifetime of a workflow Job
       uses: waycarbon/github-action-container-cleanup@v1
     
