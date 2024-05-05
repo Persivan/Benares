@@ -16,7 +16,7 @@ jobs:
 
     - name: Stop and remove the old container if it exists
       run: |
-        DOCKER_CONTAINER="benares_container"
+        DOCKER_CONTAINER="benares_container_test"
         if [ "$(docker ps -a -q -f name=$DOCKER_CONTAINER)" ]; then
          docker stop $DOCKER_CONTAINER
          docker rm $DOCKER_CONTAINER
@@ -24,20 +24,20 @@ jobs:
 
     - name: Stop and remove the old container if it exists
       run: |
-        DOCKER_IMAGE="benares"
+        DOCKER_IMAGE="benares_test"
         if [ "$(docker images -q $DOCKER_IMAGE)" ]; then
             docker rmi $DOCKER_IMAGE
         fi
     
     - name: Build the Docker image
       run: |
-        DOCKER_IMAGE="benares"
+        DOCKER_IMAGE="benares_test"
         docker build . --file Dockerfile --tag $DOCKER_IMAGE
 
     - name: Run the Docker container
       run: |
-        DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
-        DOCKER_CONTAINER="benares_container"
+        DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_TEST }}
+        DOCKER_CONTAINER="benares_container_test"
         docker run \
           --detach \
           -v "/projects/Benares/assets:/usr/src/app/assets" \
