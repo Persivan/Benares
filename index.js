@@ -26,6 +26,7 @@ const db = ezJson.getObj();
 
 // Импорт реакций на сообщения
 const goodRoleHandler = require('./messageCreate/goodRole.js');
+const {log} = require("./tools/tools");
 
 const games = [
     "Honkai Impact 3",
@@ -166,7 +167,7 @@ client.on("ready", () => {
         // let mainGuild = client.guilds.cache.get('803319898813890620');
         // let index = Math.floor(Math.random() * icons.length);
         // mainGuild.setIcon(icons[index])
-        //     .then(updated => console.log('Icon updated!!' + index))
+        //     .then(updated => log('Icon updated!!' + index))
         //     .catch(console.error);
 
         // Change status
@@ -195,7 +196,7 @@ client.on("ready", () => {
         goodRoleHandler(client, db, config)
 
     }, 480000);
-    console.log(`Logged in as ${client.user.tag}!`);
+    log(`Logged in as ${client.user.tag}!`);
 })
 ;
 
@@ -208,7 +209,8 @@ client.on("messageCreate", async (message) => {
     // обновление БД при написание сообщения
     // Добавление goodUserRoleId, users
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
-        Tools.addProps(db.activity, `${message.guildId}`, []);
+        Tools.addProps(db.activity, `${message.guildId}`, {});
+        Tools.addProps(db.activity, `${message.guildId}.guildName`, message.guild.name);
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
         Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${message.guildId}.afkUserRoleId`, "");
@@ -234,7 +236,7 @@ client.on("messageCreate", async (message) => {
         message
             .reply("tested")
             .then(() =>
-                console.log(
+                log(
                     `Replied to message "${message.content}" from "${message.author.username}"`
                 )
             )
@@ -247,13 +249,13 @@ client.on("messageCreate", async (message) => {
         message
             .reply("yes, honey")
             .then(() =>
-                console.log(
+                log(
                     `Replied to message "${message.content}" from "${message.author.username}"`
                 )
             )
             .catch(console.error);
         message.guild.leave()
-            .then(guild => console.log(`Left the guild: ${guild.name}`))
+            .then(guild => log(`Left the guild: ${guild.name}`))
             .catch(console.error);
     }
 
@@ -275,7 +277,7 @@ client.on("messageCreate", async (message) => {
         //             count = x;
         //         })
         //         .catch(() => {
-        //             console.log(`Error in countFileLines with path \"${filePath}\"`)
+        //             log(`Error in countFileLines with path \"${filePath}\"`)
         //             count = "**_more then 1? i guess... sorry there is error)_**"
         //         });
         //     message.channel
@@ -285,7 +287,7 @@ client.on("messageCreate", async (message) => {
         //             files: [config.folders.images + "/help.png"],
         //         })
         //         .then(() =>
-        //             console.log(
+        //             log(
         //                 `Send message on "${message.content}" from "${message.author.username}"`
         //             )
         //         )
@@ -304,7 +306,7 @@ client.on("messageCreate", async (message) => {
         //     // Ручная проверка есть ли в сообщение упоминания
         //     if (msg.match(/<@.?[0-9]*?>/g)) {
         //         //Replace All Message Mentions Into Nothing
-        //         console.log('someone did it again')
+        //         log('someone did it again')
         //         msg = msg.replaceAll(/<@.?[0-9]*?>/g, "");
         //         msg = msg.replaceAll(" ", "");
         //     }
@@ -319,10 +321,10 @@ client.on("messageCreate", async (message) => {
         //             content: 'bb'
         //         });
         //         await message.author.send('Vi zaebali! Не шли в мейн соообщение которые не содержат ничего кроме упоминания! https://discord.gg/hwCw6D9nQC')
-        //             .catch(e => console.log(e))
+        //             .catch(e => log(e))
         //         //if (message.author.id == '252864307694534667') {
         //             await message.member.kick('Sends an empty message with mentions in main channel')
-        //                 .catch(e => console.log(e))
+        //                 .catch(e => log(e))
         //         //}
         //
         //     }
@@ -332,30 +334,30 @@ client.on("messageCreate", async (message) => {
     else if (message.channelId === "1062427808091099266" ||
         message.channelId === "1156308603343483010"
     ) {
-        console.log(111)
+        log(111)
         let msg = message.content;
-        console.log(111)
+        log(111)
         // Ничего не выводить если это комментарий
         if (msg.startsWith('//') || msg === "") return;
-        console.log(111)
+        log(111)
         let currDate = new Date().toLocaleDateString();
         let currTime = new Date().toLocaleTimeString();
-        console.log(`${currDate} ${currTime} openAI message: "${msg}"; name = ${message.author.username}`);
+        log(`messageCreate - openAI message: "${msg}"; name = ${message.author.username}`);
         await openai.chat.completions.create({
             messages: [{role: 'user', content: msg}],
             model: 'gpt-4',
         })
             .then(async result => {
-                console.log(result.choices[0].message);
+                log(result.choices[0].message);
                 await message.reply(result.choices[0].message.content)
                     .catch(async er => (await message.reply('Something went wrong (скорее всего размер сообщения от бота более 2000 символов')))
             })
             .catch(async err => {
-                console.log(err);
+                log(err);
                 try {
                     await message.reply("Something went wrong(( " + err.response.status + ": " + err.response.statusText);
                 } catch (e) {
-                    console.log(e);
+                    log(e);
                 }
 
             })
@@ -365,7 +367,7 @@ client.on("messageCreate", async (message) => {
 //Commands
 client.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
-    console.log(interaction.commandName);
+    log(interaction.commandName);
     if (interaction.commandName === "ping") {
         await interaction.reply("Pong!");
     }
@@ -375,10 +377,10 @@ client.on("interactionCreate", async (interaction) => {
             let date1 = Math.floor(elem.lastMessageDate / (1000 * 60 * 60 * 24));
             let date2 = Math.floor(elem.lastVoiceStateUpdateDate / (1000 * 60 * 60 * 24));
             let currentDate = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-            console.log(elem.name)
-            console.log(date1)
-            console.log(date2)
-            console.log(currentDate)
+            log(elem.name)
+            log(date1)
+            log(date2)
+            log(currentDate)
             if (currentDate - date1 >= interaction.options.get('days').value && currentDate - date2 >= interaction.options.get('days').value) {
                 let obj = {
                     Айди: elem.id,
@@ -416,7 +418,7 @@ client.on("interactionCreate", async (interaction) => {
         let message = '';
         if (inactiivityList.length !== 0) {
             let roleId = db.activity[interaction.guildId].roles.find((elem) => elem.name === interaction.options.get('role_name').value);
-            console.log(roleId);
+            log(roleId);
             if (!roleId) {
                 let role = await interaction.guild.roles.create({
                     name: interaction.options.get('role_name').value,
@@ -502,20 +504,19 @@ let channelName = "[🟡] JOJO for ";
 let notStandartName = "[🟡] Someone is JoJo [🕜]";
 
 client.on("voiceStateUpdate", (oldState, newState) => {
-    let currDate = new Date().toLocaleDateString();
-    let currTime = new Date().toLocaleTimeString();
-    console.log(`${currDate} ${currTime} voiceStateUpdate from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
+    log(`voiceStateUpdate - from Guild: ${newState.guild.name}; name = ${newState.member.user.username}`);
 
     // обновление БД при активации голоса
     // Добавление goodUserRoleId, users, afkUserRoleId
-    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guildId)) {
-        Tools.addProps(db.activity, `${newState.guildId}`, []);
-        Tools.addProps(db.activity, `${newState.guildId}.users`, []);
-        Tools.addProps(db.activity, `${newState.guildId}.goodUserRoleId`, "");
-        Tools.addProps(db.activity, `${newState.guildId}.afkUserRoleId`, "");
-        Tools.addProps(db.activity, `${newState.guildId}.autoRoflRole`, false);
-        Tools.addProps(db.activity, `${newState.guildId}.afkRoflRole`, false);
-        Tools.addProps(db.activity, `${newState.guildId}.notExistMeansAfk`, false);
+    if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guild.id)) {
+        Tools.addProps(db.activity, `${newState.guild.id}`, {});
+        Tools.addProps(db.activity, `${newState.guild.id}.guildName`, newState.guild.name);
+        Tools.addProps(db.activity, `${newState.guild.id}.users`, []);
+        Tools.addProps(db.activity, `${newState.guild.id}.goodUserRoleId`, "");
+        Tools.addProps(db.activity, `${newState.guild.id}.afkUserRoleId`, "");
+        Tools.addProps(db.activity, `${newState.guild.id}.autoRoflRole`, false);
+        Tools.addProps(db.activity, `${newState.guild.id}.afkRoflRole`, false);
+        Tools.addProps(db.activity, `${newState.guild.id}.notExistMeansAfk`, false);
     }
     let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
     if (index !== -1) {
@@ -544,7 +545,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     //   }
     //if (newState.member.guild.id === '803319898813890620') {
     //    newState.member.setNickname(null)
-    //        .catch(console.log);
+    //        .catch(log);
     //}
 
     //Yarik only 1 channel

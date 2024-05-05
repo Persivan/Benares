@@ -127,5 +127,15 @@ module.exports = {
 
     isObjHaveRolesAndUsersArrays(obj, guildId) {
         return (Object.hasOwn(obj, guildId) && Object.hasOwn(obj[guildId], 'goodUserRoleId') && Object.hasOwn(obj[guildId], 'users') && Object.hasOwn(obj[guildId], 'afkUserRoleId'));
+    },
+
+    /**
+     * Логирование с датой
+     * @param msg
+     */
+    log(msg) {
+        let currDate = new Date().toLocaleDateString();
+        let currTime = new Date().toLocaleTimeString();
+        console.log(`${currDate} ${currTime} - ${msg}`);
     }
 };
