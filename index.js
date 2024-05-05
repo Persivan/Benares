@@ -209,7 +209,8 @@ client.on("messageCreate", async (message) => {
     // обновление БД при написание сообщения
     // Добавление goodUserRoleId, users
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
-        Tools.addProps(db.activity, `${message.guildId}`, []);
+        Tools.addProps(db.activity, `${message.guildId}`, {});
+        Tools.addProps(db.activity, `${message.guildId}.guildName`, message.guild.name);
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
         Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${message.guildId}.afkUserRoleId`, "");
@@ -509,6 +510,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     // Добавление goodUserRoleId, users, afkUserRoleId
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guild.id)) {
         Tools.addProps(db.activity, `${newState.guild.id}`, []);
+        Tools.addProps(db.activity, `${newState.guild.id}.guildName`, newState.guild.name);
         Tools.addProps(db.activity, `${newState.guild.id}.users`, []);
         Tools.addProps(db.activity, `${newState.guild.id}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${newState.guild.id}.afkUserRoleId`, "");
