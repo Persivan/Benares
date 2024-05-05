@@ -509,7 +509,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     // обновление БД при активации голоса
     // Добавление goodUserRoleId, users, afkUserRoleId
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guild.id)) {
-        Tools.addProps(db.activity, `${newState.guild.id}`, []);
+        Tools.addProps(db.activity, `${newState.guild.id}`, {});
         Tools.addProps(db.activity, `${newState.guild.id}.guildName`, newState.guild.name);
         Tools.addProps(db.activity, `${newState.guild.id}.users`, []);
         Tools.addProps(db.activity, `${newState.guild.id}.goodUserRoleId`, "");
@@ -518,7 +518,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         Tools.addProps(db.activity, `${newState.guild.id}.afkRoflRole`, false);
         Tools.addProps(db.activity, `${newState.guild.id}.notExistMeansAfk`, false);
     }
-    log()
     let index = db.activity[newState.guild.id].users.findIndex((elem) => elem.id === newState.member.user.id)
     if (index !== -1) {
         db.activity[newState.guild.id].users[index].lastVoiceStateUpdateDate = Date.now();
