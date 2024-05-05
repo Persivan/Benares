@@ -36,6 +36,7 @@ jobs:
 
     - name: Run the Docker container
       run: |
+        DOCKER_IMAGE="benares"
         DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
         DOCKER_CONTAINER="benares_container"
         docker run \
@@ -45,4 +46,4 @@ jobs:
           -e "DISCORD_TOKEN=$DISCORD_TOKEN" \
           -e "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
           --name $DOCKER_CONTAINER \
-          benares
+          $DOCKER_IMAGE
