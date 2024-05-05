@@ -2,17 +2,21 @@ name: CI
 
 on:
   push:
-    branches:
-    - main
+    branches: [ main, sast ]
 
 jobs:
   njsscan:
     name: SAST scan (NodeJsScan)
     strategy:
       matrix:
-        os: [Linux, ubuntu-latest]
+        os: [Linux]
     runs-on: ${{ matrix.os }}
     steps:
+    # There is should be cleanup for images 
+    
+    - name: Cleanup containers created by the lifetime of a workflow Job
+      uses: waycarbon/github-action-container-cleanup@v1
+    
     - name: Checkout the code
       uses: actions/checkout@v2
       
@@ -32,10 +36,13 @@ jobs:
     name: Build Image and Run Image Scan
     strategy:
       matrix:
-        os: [Linux, ubuntu-latest]
+        os: [Linux]
     runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Cleanup containers created by the lifetime of a workflow Job
+      uses: waycarbon/github-action-container-cleanup@v1
+    
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -53,19 +60,19 @@ jobs:
     - name: Build Docker Image
       run: docker build -f Dockerfile -t myapp:latest .
 
-    # - name: Docker Scout Scan
-    #   uses: docker/scout-action@v1.8.0
-    #   with:
-    #     debug: true
-    #     dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
-    #     dockerhub-password: ${{ secrets.DOCKER_PASSWORD }}
-    #     command: quickview,cves
-    #     only-severities: critical,high
-    #     sarif-file: scout-report.sarif
+    - name: Docker Scout Scan
+      uses: docker/scout-action@v1.8.0
+      with:
+        debug: true
+        dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
+        dockerhub-password: ${{ secrets.DOCKER_PASSWORD }}
+        command: quickview,cves
+        only-severities: critical,high
+        sarif-file: scout-report.sarif
 
-    # - name: Upload Artifact
-    #   uses: actions/upload-artifact@v3
-    #   if: always()
-    #   with:
-    #     name: docker-scout-findings
-    #     path: scout-report.sarif
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: docker-scout-findings
+        path: scout-report.sarif
