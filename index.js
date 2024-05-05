@@ -208,6 +208,7 @@ client.on("messageCreate", async (message) => {
     // обновление БД при написание сообщения
     // Добавление goodUserRoleId, users
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, message.guildId)) {
+        Tools.addProps(db.activity, `${message.guildId}`, []);
         Tools.addProps(db.activity, `${message.guildId}.users`, []);
         Tools.addProps(db.activity, `${message.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${message.guildId}.afkUserRoleId`, "");
@@ -508,6 +509,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     // обновление БД при активации голоса
     // Добавление goodUserRoleId, users, afkUserRoleId
     if (!Tools.isObjHaveRolesAndUsersArrays(db.activity, newState.guildId)) {
+        Tools.addProps(db.activity, `${newState.guildId}`, []);
         Tools.addProps(db.activity, `${newState.guildId}.users`, []);
         Tools.addProps(db.activity, `${newState.guildId}.goodUserRoleId`, "");
         Tools.addProps(db.activity, `${newState.guildId}.afkUserRoleId`, "");
