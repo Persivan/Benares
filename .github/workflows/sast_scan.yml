@@ -2,15 +2,14 @@ name: CI
 
 on:
   push:
-    branches:
-    - main
+    branches: [ main, sast ]
 
 jobs:
   njsscan:
     name: SAST scan (NodeJsScan)
     strategy:
       matrix:
-        os: [Linux, ubuntu-latest]
+        os: [Linux]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout the code
