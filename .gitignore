@@ -134,5 +134,6 @@ dist
 
 # custom
 db.json
+db_test.json
 assets
 

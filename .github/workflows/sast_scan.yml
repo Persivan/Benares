@@ -1,4 +1,4 @@
-name: CI
+name: SAST Scan of the Image and Code
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     name: SAST scan (NodeJsScan)
     strategy:
       matrix:
-        os: [Linux]
+        os: [ Linux ]
     runs-on: ${{ matrix.os }}
     steps:
     # There is should be cleanup for images 
