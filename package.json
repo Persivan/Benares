@@ -4,8 +4,7 @@
   "description": "Discord bot",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
-    "deploy_docker": "bash deploy.sh"
+    "start": "node ."
   },
   "repository": {
     "type": "git",
