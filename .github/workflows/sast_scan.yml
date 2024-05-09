@@ -2,7 +2,7 @@ name: SAST Scan of the Image and Code
 
 on:
   push:
-    branches: [ main, sast ]
+    branches: [ sast ]
 
 jobs:
   njsscan:
