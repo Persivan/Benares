@@ -1,0 +1,25 @@
+version: '3'
+services:
+  benares_test:
+    image: benares_test
+    container_name: benares_container_test
+    volumes:
+      - "/projects/Benares/logs_test:/root/.npm/_logs"
+      - "/projects/Benares/assets:/usr/src/app/assets"
+      - "/projects/Benares/db_test.json:/usr/src/app/db.json"
+    environment:
+      - DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_TEST }}
+      - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+    restart: unless-stopped
+
+  benares_prod:
+    image: benares
+    container_name: benares_container
+    volumes:
+      - "/projects/Benares/logs:/root/.npm/_logs"
+      - "/projects/Benares/assets:/usr/src/app/assets"
+      - "/projects/Benares/db.json:/usr/src/app/db.json"
+    environment:
+      - DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
+      - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+    restart: unless-stopped
