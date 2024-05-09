@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 # Копируем файлы package.json и package-lock.json и устанавливаем зависимости
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --only=production
 
 # Копируем все файлы проекта
 COPY . .
