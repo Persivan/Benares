@@ -91,10 +91,5 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Build the Docker image
-        run: |
-          DOCKER_IMAGE="benares"
-          docker build . --file Dockerfile --tag $DOCKER_IMAGE
-
       - name: Set up Docker Environment
         run: docker-compose -f docker-compose.yml up --detach

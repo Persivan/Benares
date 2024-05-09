@@ -1,7 +1,9 @@
 version: '3'
 services:
   benares_test:
-    image: benares
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: benares_container
     volumes:
       - "/projects/Benares/logs_test:/root/.npm/_logs"
