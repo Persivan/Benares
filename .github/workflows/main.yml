@@ -1,0 +1,95 @@
+name: Continuous Integration Prod with Docker
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  njsscan:
+    name: SAST scan (NodeJsScan)
+    strategy:
+      matrix:
+        os: [ Linux ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # There is should be cleanup for images
+
+      - name: Cleanup containers created by the lifetime of a workflow Job
+        uses: waycarbon/github-action-container-cleanup@v1
+
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: nodejsscan scan
+        id: njsscan
+        uses: ajinabraham/njsscan-action@master
+        with:
+          args: '. --sarif --output njsscan-report.sarif || true'
+
+      - name: Upload njsscan report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: njsscan-report.sarif
+
+  image_scan:
+    name: Build Image and Run Image Scan
+    strategy:
+      matrix:
+        os: [Linux]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Cleanup containers created by the lifetime of a workflow Job
+        uses: waycarbon/github-action-container-cleanup@v1
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Will not work on self-hosted runners without root permissions (Avoid root permissions)
+      - name: Set up Docker
+        uses: docker-practice/actions-setup-docker@v1
+        with:
+          docker_version: '20.10.7'
+          docker_buildx: false
+          docker_daemon_json: |
+            {
+              "experimental": false
+            }
+
+      - name: Build Docker Image
+        run: docker build -f Dockerfile -t myapp:latest .
+
+      - name: Docker Scout Scan
+        uses: docker/scout-action@v1.8.0
+        with:
+          debug: true
+          dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKER_PASSWORD }}
+          command: quickview,cves
+          only-severities: critical,high
+          sarif-file: scout-report.sarif
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: docker-scout-findings
+          path: scout-report.sarif
+
+
+  docker_build:
+
+    runs-on: [ Linux, X64 ]
+    needs: [ njsscan, image_scan ]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Environment
+        run: docker-compose -f docker-compose.yml up --detach
