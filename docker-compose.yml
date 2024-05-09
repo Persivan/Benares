@@ -1,7 +1,7 @@
 version: '3'
 services:
   benares_test:
-    image: benares_test
+    image: benares
     container_name: benares_container_test
     volumes:
       - "/projects/Benares/logs_test:/root/.npm/_logs"
