@@ -7,6 +7,5 @@ services:
       - "/projects/Benares/logs_test:/root/.npm/_logs"
       - "/projects/Benares/assets:/usr/src/app/assets"
       - "/projects/Benares/db_test.json:/usr/src/app/db.json"
-    env_file:
-      .env.test
-    restart: no
+    env_file: .env.test
+    restart: on-failure
