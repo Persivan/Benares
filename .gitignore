@@ -136,4 +136,5 @@ dist
 db.json
 db_test.json
 assets
+.env.test
 
