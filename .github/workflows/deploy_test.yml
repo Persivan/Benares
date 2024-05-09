@@ -1,4 +1,4 @@
-name: Docker Image CI Test
+name: Continuous Integration Test with Docker
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -10,13 +10,13 @@ on:
 
 jobs:
 
-  build:
+  docker_build:
 
     runs-on: [ Linux, X64 ]
 
     steps:
-      - name: Checkout the code
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker Compose
+      - name: Set up Docker Environment
         run: docker-compose -f docker-compose-test.yml up --detach

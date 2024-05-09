@@ -1,4 +1,8 @@
-name: Docker Image CI Prod
+name: Continuous Integration Prod with Docker
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
@@ -6,48 +10,13 @@ on:
 
 jobs:
 
-  build:
+  docker_build:
 
-    runs-on: [Linux, X64]
+    runs-on: [ Linux, X64 ]
 
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Stop and remove the old container if it exists
-      run: |
-        DOCKER_CONTAINER="benares_container"
-        if [ "$(docker ps -a -q -f name=$DOCKER_CONTAINER)" ]; then
-         docker stop $DOCKER_CONTAINER
-         docker rm $DOCKER_CONTAINER
-        fi
-
-    - name: Stop and remove the old container if it exists
-      run: |
-        DOCKER_IMAGE="benares"
-        if [ "$(docker images -q $DOCKER_IMAGE)" ]; then
-            docker rmi $DOCKER_IMAGE
-        fi
-    
-    - name: Build the Docker image
-      run: |
-        DOCKER_IMAGE="benares"
-        docker build . --file Dockerfile --tag $DOCKER_IMAGE
-
-    # - name: Run the Docker container
-    #   run: |
-    #     DOCKER_IMAGE="benares"
-    #     DISCORD_TOKEN=${{ secrets.DISCORD_APP_TOKEN_PROD }}
-    #     DOCKER_CONTAINER="benares_container"
-    #     docker run \
-    #       --detach \
-    #       -v "/projects/Benares/logs:/root/.npm/_logs" \
-    #       -v "/projects/Benares/assets:/usr/src/app/assets" \
-    #       -v "/projects/Benares/db.json:/usr/src/app/db.json" \
-    #       -e "DISCORD_TOKEN=$DISCORD_TOKEN" \
-    #       -e "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
-    #       --name $DOCKER_CONTAINER \
-    #       $DOCKER_IMAGE
-    - name: Run the Docker-compose
-      run: docker-compose up
-
+      - name: Set up Docker Environment
+        run: docker-compose -f docker-compose.yml up --detach
