@@ -1,6 +1,6 @@
 version: '3'
 services:
-  benares_test:
+  benares:
     build:
       context: .
       dockerfile: Dockerfile
