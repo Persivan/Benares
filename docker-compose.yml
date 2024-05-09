@@ -2,7 +2,7 @@ version: '3'
 services:
   benares_test:
     image: benares
-    container_name: benares_container_test
+    container_name: benares_container
     volumes:
       - "/projects/Benares/logs_test:/root/.npm/_logs"
       - "/projects/Benares/assets:/usr/src/app/assets"
