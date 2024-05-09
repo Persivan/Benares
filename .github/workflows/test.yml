@@ -18,17 +18,5 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Stop and remove the old container if it exists
-        run: |
-          DOCKER_IMAGE="benares_test"
-          if [ "$(docker images -q $DOCKER_IMAGE)" ]; then
-              docker rmi $DOCKER_IMAGE
-          fi
-
-      - name: Build the Docker image
-        run: |
-          DOCKER_IMAGE="benares_test"
-          docker build . --file Dockerfile --tag $DOCKER_IMAGE
-
       - name: Set up Docker Environment
-        run: docker-compose -f docker-compose-test.yml up --detach
+        run: docker-compose -f docker-compose.test.yml up --detach
