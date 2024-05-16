@@ -92,4 +92,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Docker Environment
-        run: docker-compose -f docker-compose.yml up --detach
+        run: docker-compose -f docker-compose.yml up --detach --build
