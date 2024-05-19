@@ -1,5 +1,5 @@
 # Benares
-Discord bot
+Discord bot Benares
 
 # Для запуска
 Node js v21 (или docker, если планируется запуск внутри контейнера)
