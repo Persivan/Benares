@@ -11,12 +11,12 @@ module.exports = (client, db, config) => {
                 console.log('[roles] Сервера нет в бд');
                 return;
             }
-            if (!db.activity[guild.id].afkUserRoleId) {
-                console.log('[roles] Нет роли для выдачи афк');
+            if (!db.activity[guild.id].afkUserRoleId && db.activity[guild.id].afkRoflRole) {
+                console.log('[roles] Нет роли для выдачи афк, но при этом включена');
                 return;
             }
-            if (!db.activity[guild.id].goodUserRoleId) {
-                console.log('[roles] Нет роли для выдачи хорошей');
+            if (!db.activity[guild.id].goodUserRoleId && db.activity[guild.id].autoRoflRole) {
+                console.log('[roles] Нет роли для выдачи хорошей, но при этом включена');
                 return;
             }
             // Если в бд стоит не использовать функционал, ничего не делаем
@@ -32,6 +32,9 @@ module.exports = (client, db, config) => {
             log('[roles] Роль: ' + db.activity[guild.id].goodUserRoleId);
             let roleGood = guild.roles.cache.get(db.activity[guild.id].goodUserRoleId);
             let roleBad = guild.roles.cache.get(db.activity[guild.id].afkUserRoleId);
+
+            log(roleGood)
+            log(roleBad)
 
             if (!roleGood) log(`[roles] goodUserRoleId роли не существует`)
             if (!roleBad) log(`[roles] afkUserRoleId роли не существует`)
@@ -49,11 +52,11 @@ module.exports = (client, db, config) => {
 
                         // Выходим если сервера нет в config'е
                         if (!db.activity[guild.id]) {
-                            console.log('[roles] сервера не в config файле: ' + guild.id);
+                            console.log('[roles] сервера нет в config файле: ' + guild.id);
                             return;
                         }
 
-                        index = db.activity[guild.id].users.findIndex((elem) => elem.id === member.user.id)
+                        let index = db.activity[guild.id].users.findIndex((elem) => elem.id === member.user.id)
 
                         // Если чела нет в бд и сервер не должен выдавать роль афк для несуществующих челов
                         if (index === -1) {
