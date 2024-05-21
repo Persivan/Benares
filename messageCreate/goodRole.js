@@ -29,9 +29,12 @@ module.exports = (client, db, config) => {
             }
 
             // Получаем обьект роли
-            console.log('[roles] Роль: ' + db.activity[guild.id].goodUserRoleId);
+            log('[roles] Роль: ' + db.activity[guild.id].goodUserRoleId);
             let roleGood = guild.roles.cache.get(db.activity[guild.id].goodUserRoleId);
             let roleBad = guild.roles.cache.get(db.activity[guild.id].afkUserRoleId);
+
+            if (!roleGood) log(`[roles] goodUserRoleId роли не существует`)
+            if (!roleBad) log(`[roles] afkUserRoleId роли не существует`)
 
             // Получаем список юзеров
             guild.members.fetch()
