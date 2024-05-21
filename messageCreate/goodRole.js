@@ -1,3 +1,5 @@
+const {log} = require("../tools/tools");
+
 module.exports = (client, db, config) => {
         // Забрать роль успешного человека
         console.log('[roles] Началась обработка ролей');
@@ -21,12 +23,18 @@ module.exports = (client, db, config) => {
             let afkRoflRole = db.activity[guild.id].afkRoflRole
             let autoRoflRole = db.activity[guild.id].autoRoflRole
             let notExistMeansAfk = db.activity[guild.id].notExistMeansAfk // Если чела нет в бд, значит он афк
-            if (!afkRoflRole && !autoRoflRole) return;
+            if (!afkRoflRole && !autoRoflRole) {
+                log(`Server does not contain specific roles. afkRoflRole: ${afkRoflRole}; autoRoflRole: ${autoRoflRole}`);
+                return;
+            }
 
             // Получаем обьект роли
-            console.log('[roles] Роль: ' + db.activity[guild.id].goodUserRoleId);
+            log('[roles] Роль: ' + db.activity[guild.id].goodUserRoleId);
             let roleGood = guild.roles.cache.get(db.activity[guild.id].goodUserRoleId);
             let roleBad = guild.roles.cache.get(db.activity[guild.id].afkUserRoleId);
+
+            if (!roleGood) log(`[roles] goodUserRoleId роли не существует`)
+            if (!roleBad) log(`[roles] afkUserRoleId роли не существует`)
 
             // Получаем список юзеров
             guild.members.fetch()
