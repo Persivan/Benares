@@ -1,4 +1,4 @@
-require('dotenv').config( { path: '.env.test' });
+require('dotenv').config();
 
 const {Client, GatewayIntentBits, ChannelType, PermissionsBitField} = require("discord.js");
 const client = new Client({
@@ -158,8 +158,8 @@ client.on("ready", () => {
     let reg_com = require("./tools/reg_com.js");
     reg_com(0, client.user.id);
     // Забираем/выдаем роль
-    console.log(111);
     goodRoleHandler(client, db, config)
+
     // run every 480 seconds
     setInterval(async () => {
         // Register commands
