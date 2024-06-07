@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const ezJson = require('./ezJson');
 module.exports = function (debug = 0, discordUserId) {
   if (!discordUserId) {
     console.log('discordUserId is null!');
@@ -10,12 +11,11 @@ module.exports = function (debug = 0, discordUserId) {
   const { SlashCommandBuilder } = require('@discordjs/builders');
 
   //Params
-  let info = require('../config');
+  let info = require('../../config');
 
   // Get guilds
   const ezJson = require('./ezJson');
-  ezJson.openFile('./db.json');
-  const {} = require('./ezJson');
+  ezJson.openFile('../../db.json');
   const { activity } = ezJson.getObj();
   const guildIds = Object.getOwnPropertyNames(activity);
   if (!guildIds || !guildIds.length) {
