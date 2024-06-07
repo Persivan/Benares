@@ -42,6 +42,7 @@ const constants = loadConstants(path.join(__dirname, 'const'));
 // Bot is ready
 // Import the handlers
 const mainLoop = require('./eventHandlers/ready/mainLoop');
+const setStatus = require('./eventHandlers/ready/setStatus');
 
 client.on("ready", () => {
     // Логирование
@@ -50,9 +51,11 @@ client.on("ready", () => {
     // Регистрация команд
     reg_com(0, client.user.id);
     // Забираем/выдаем роль
-    goodRoleHandler(client, db, config)
+    goodRoleHandler(client, db, log)
+    // Устанавливаем статус
+    setStatus(client, constants)
     // Цикл (480 сек)
-    mainLoop(client, reg_com, goodRoleHandler, config, db, constants);
+    mainLoop(client, reg_com, goodRoleHandler, config, db, constants, log);
 })
 
 
