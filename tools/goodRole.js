@@ -1,6 +1,4 @@
-const {log} = require("../tools/tools");
-
-module.exports = (client, db, config) => {
+module.exports = (client, db, log) => {
         // Забрать роль успешного человека
         console.log('[roles] Началась обработка ролей');
         client.guilds.cache.forEach((guild) => {

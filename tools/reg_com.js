@@ -1,3 +1,4 @@
+const {SlashCommandBuilder} = require("@discordjs/builders");
 module.exports = function (debug = 0, discordUserId) {
     if (!discordUserId) {
         console.log('discordUserId is null!');
@@ -27,7 +28,20 @@ module.exports = function (debug = 0, discordUserId) {
     const commands = [
         new SlashCommandBuilder()
             .setName("ping")
-            .setDescription("Replies with Pong!")
+            .setDescription("Replies with Pong!"),
+        new SlashCommandBuilder()
+            .setName("activity")
+            .setDescription("выводит список неактивных указанное количество дней")
+            .addNumberOption(option => option.setName("days")
+                .setDescription("количество дней")
+                .setMinValue(1)
+                .setMaxValue(30)),
+        new SlashCommandBuilder()
+            .setName("activity_clear_rofl_roles")
+            .setDescription("не помню"),
+        new SlashCommandBuilder()
+            .setName("activity_create_rofl_roles")
+            .setDescription("не помню"),
     ];
 
     //Dynamic commands
