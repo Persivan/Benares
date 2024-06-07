@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // Импорт кастомных библиотек
 
-const config = require('./config');
+const config = require('../config');
 const Tools = require('./tools/tools');
 const ezJson = require('./tools/ezJson');
 const { log } = require('./tools/tools');
@@ -32,7 +32,8 @@ const openai = new OpenAI({
 });
 
 // Загрузка БД
-ezJson.openFile('./db.json');
+console.log(__dirname);
+ezJson.openFile('../../db.json');
 const db = ezJson.getObj();
 
 // Загрузка констант
