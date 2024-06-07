@@ -1,7 +1,7 @@
 module.exports = {
-    folders: {
-        stickers: "./assets/stickers/",
-        images: "./assets/",
-        emoji: "./assets/emoji/"
-    },
-}
+  folders: {
+    stickers: './assets/stickers/',
+    images: './assets/',
+    emoji: './assets/emoji/',
+  },
+};
