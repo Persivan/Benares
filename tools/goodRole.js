@@ -1,4 +1,4 @@
-const {log} = require("../tools/tools");
+const {log} = require("./tools");
 
 module.exports = (client, db, config) => {
         // Забрать роль успешного человека
