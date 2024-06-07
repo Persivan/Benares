@@ -1,11 +1,14 @@
 const fs = require('fs');
+const path = require('path');
 
 module.exports = {
   filePath: '',
 
   // Сохраняет путь до файла, если найдет
   // Принимает путь до файла, относительно вызываемого файла!
-  openFile(filePath) {
+  openFile(filename) {
+    const filePath = path.join(__dirname, filename);
+    console.log(filePath);
     if (fs.existsSync(filePath)) {
       this.filePath = filePath;
     } else {
@@ -34,7 +37,7 @@ module.exports = {
       return;
     }
     const data = JSON.stringify(jsonObj, null, 2);
-    fs.writeFileSync('./db.json', data, err => {
+    fs.writeFileSync(this.filePath, data, err => {
       if (err) {
         throw err;
       }
@@ -46,9 +49,10 @@ module.exports = {
   getObj() {
     if (this.filePath === '') {
       console.log('openFile first!');
-      return;
+      return null;
     }
-    const json = require('../' + this.filePath);
+    console.log(this.filePath);
+    const json = require(this.filePath);
     return json;
   },
 };
