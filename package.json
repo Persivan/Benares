@@ -4,8 +4,12 @@
   "description": "Discord bot",
   "main": "index.js",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "test": "echo \"Error: I SHOULD FAIL LOLOLOLOLOL \" && exit 1",
   },
+  "pre-commit": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Persivan/Benares.git"
@@ -23,5 +27,8 @@
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "openai": "^4.14.1"
+  },
+  "devDependencies": {
+    "pre-commit": "^1.2.2"
   }
 }
