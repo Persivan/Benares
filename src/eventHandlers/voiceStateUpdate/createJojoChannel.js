@@ -22,7 +22,7 @@ module.exports = (oldState, newState) => {
           permissionOverwrites: [
             {
               id: newState.guild.roles.everyone, //To make it be seen by a certain role, user an ID instead
-              deny: [new PermissionsBitField().add()], //Deny permission
+              deny: [PermissionFlagsBits.ViewChannel], //Deny permission
             },
           ],
           parent: mainCategory,
