@@ -19,15 +19,15 @@ module.exports = (oldState, newState) => {
         .create({
           name: channelName + newState.member.user.username,
           type: ChannelType.GuildVoice,
-          permissionOverwrites: [
+          parent: mainCategory,
+        })
+        .then(chn => {
+          channel.overwritePermissions([
             {
               id: newState.guild.roles.everyone, //To make it be seen by a certain role, user an ID instead
               deny: [PermissionFlagsBits.ViewChannel], //Deny permission
             },
-          ],
-          parent: mainCategory,
-        })
-        .then(chn => {
+          ]);
           //move member
           newState.member.voice.setChannel(chn).catch(console.error);
           myChannel.id = chn.id;
