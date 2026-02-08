@@ -9,7 +9,7 @@ let standartName = '[🦴] JoJo Stand';
 let channelName = '[🟡] JOJO for ';
 let notStandartName = '[🟡] Someone is JoJo [🕜]';
 
-const { ChannelType, PermissionsBitField } = require('discord.js');
+const { ChannelType, PermissionFlagsBits } = require('discord.js');
 module.exports = (oldState, newState) => {
   if (newState.channelId === mainChannel) {
     //No secret channel
