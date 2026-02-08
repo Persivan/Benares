@@ -22,7 +22,7 @@ module.exports = (oldState, newState) => {
           parent: mainCategory,
         })
         .then(chn => {
-          channel.overwritePermissions([
+          chn.overwritePermissions([
             {
               id: newState.guild.roles.everyone, //To make it be seen by a certain role, user an ID instead
               deny: [PermissionFlagsBits.ViewChannel], //Deny permission
