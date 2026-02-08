@@ -37,7 +37,7 @@ module.exports = async (message, client, log, Tools, openai, config) => {
     await openai.chat.completions
       .create({
         messages: [{ role: 'user', content: msg }],
-        model: 'gpt-4',
+        model: 'gpt-5-nano',
       })
       .then(async result => {
         log(result.choices[0].message);
