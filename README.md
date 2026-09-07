@@ -17,6 +17,12 @@ Node js v21 (или docker, если планируется запуск вну�
 4. Создать файлы на основе *.example
    1. .env.example -> .env
    2. db.json.example -> db.json
-5. Запуск на системе: Установить зависимости `npm i` и Запустить `npm start` (лог пишется в npm_start.log)
+5. Запуск на системе: Установить зависимости `npm i` и Запустить `npm start` (лог пишется в npm_start.log). Запуск через docker 
+
+# Docker
+Редактировать docker-compose.yml 
+Запустить
+`docker compose build benares && docker compose up -d benares`
+
 
 Деплой через github actions
